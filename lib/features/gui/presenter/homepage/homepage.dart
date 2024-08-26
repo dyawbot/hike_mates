@@ -1,17 +1,20 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:hike_mates/drawer/drawer.dart';
-import 'package:hike_mates/drawer/emergency_contacts.dart';
+import 'package:hike_mates/features/gui/ui/drawer/drawer.dart';
+import 'package:hike_mates/features/gui/ui/drawer/emergency_contacts.dart';
+import 'package:hike_mates/features/gui/ui/routers/app_router.dart';
 
-class Homepage extends StatefulWidget {
-  const Homepage({super.key});
+@RoutePage()
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   @override
-  State<Homepage> createState() => _HomepageState();
+  State<HomePage> createState() => _HomepageState();
 }
 
-class _HomepageState extends State<Homepage> {
+class _HomepageState extends State<HomePage> {
   void _showAlert() {
-    // logic forr the alert notif 
+    // logic forr the alert notif
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -32,10 +35,12 @@ class _HomepageState extends State<Homepage> {
   }
 
   void _navigateToEmergencyContacts() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const EmergencyContactsScreen()),
-    );
+    AutoRouter.of(context).push(EmergencyContactsRouteRoute());
+
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(builder: (context) => const EmergencyContactsScreen()),
+    // );
   }
 
   @override
@@ -67,9 +72,9 @@ class _HomepageState extends State<Homepage> {
                 ),
                 Padding(
                   padding: const EdgeInsets.only(right: 16.0),
-                  child: FloatingActionButton(
+                  child: ElevatedButton(
                     onPressed: _navigateToEmergencyContacts,
-                    backgroundColor: const Color.fromARGB(255, 45, 101, 234),
+                    // backgroundColor: const Color.fromARGB(255, 45, 101, 234),
                     child: const Icon(Icons.phone),
                   ),
                 ),

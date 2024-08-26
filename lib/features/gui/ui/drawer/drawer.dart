@@ -1,4 +1,6 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:hike_mates/features/gui/ui/routers/app_router.dart';
 import 'settings_page.dart'; // Import the settings page
 
 class MyDrawer extends StatelessWidget {
@@ -26,7 +28,7 @@ class MyDrawer extends StatelessWidget {
                   ),
                 ),
               )),
-              ListTile(
+          ListTile(
             onTap: () {
               Navigator.of(context).pushNamed('/emergency_contacts');
             },
@@ -51,9 +53,9 @@ class MyDrawer extends StatelessWidget {
               Icons.settings,
               color: Colors.white,
             ),
-            title: const Text("Settings", style: TextStyle(color: Colors.white)),
+            title:
+                const Text("Settings", style: TextStyle(color: Colors.white)),
           ),
-          
           ListTile(
             onTap: () {
               Navigator.of(context).pushNamed('/about');
@@ -63,7 +65,8 @@ class MyDrawer extends StatelessWidget {
           ),
           ListTile(
             onTap: () {
-              Navigator.of(context).pushNamed('/logout');
+              // Navigator.of(context).pushNamed('/logout');
+              AutoRouter.of(context).push(LoginRoute(title: ""));
             },
             leading: const Icon(Icons.logout_outlined, color: Colors.white),
             title: const Text("Logout", style: TextStyle(color: Colors.white)),

@@ -1,14 +1,17 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'add_contact_page.dart'; // Import the AddContactPage
 
-class EmergencyContactsScreen extends StatefulWidget {
-  const EmergencyContactsScreen({super.key});
+@RoutePage()
+class EmergencyContactsScreenPage extends StatefulWidget {
+  const EmergencyContactsScreenPage({super.key});
 
   @override
-  _EmergencyContactsScreenState createState() => _EmergencyContactsScreenState();
+  _EmergencyContactsScreenState createState() =>
+      _EmergencyContactsScreenState();
 }
 
-class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
+class _EmergencyContactsScreenState extends State<EmergencyContactsScreenPage> {
   final List<Map<String, String?>> _contacts = [
     {
       'name': 'National Emergency Hotline',
@@ -45,7 +48,8 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
   }
 
   void _editContact(int index) async {
-    final updatedContact = await Navigator.of(context).push<Map<String, String?>>(
+    final updatedContact =
+        await Navigator.of(context).push<Map<String, String?>>(
       MaterialPageRoute(
         builder: (context) => AddContactPage(
           name: _contacts[index]['name'],
@@ -111,7 +115,8 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 16), // Spacing between "Add New" and contacts list
+          const SizedBox(
+              height: 16), // Spacing between "Add New" and contacts list
           Expanded(
             child: ListView.builder(
               itemCount: _contacts.length,
@@ -121,8 +126,8 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
                   leading: CircleAvatar(
                     backgroundImage: contact['photo'] != null
                         ? AssetImage(contact['photo']!)
-                        : const AssetImage('lib/drawer/assets/placeholder.png') as ImageProvider,
-                    
+                        : const AssetImage('lib/drawer/assets/placeholder.png')
+                            as ImageProvider,
                   ),
                   title: Text(contact['name']!),
                   subtitle: Text(contact['phone']!),

@@ -1,13 +1,15 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
-class Login extends StatefulWidget {
-  const Login({super.key, required String title});
+@RoutePage()
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key, required String title});
 
   @override
-  State<Login> createState() => _Login();
+  State<LoginPage> createState() => _LoginPage();
 }
 
-class _Login extends State<Login> {
+class _LoginPage extends State<LoginPage> {
   final _formkey = GlobalKey<FormState>();
   final TextEditingController _emailInput = TextEditingController();
   final TextEditingController _passInput = TextEditingController();

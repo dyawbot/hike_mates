@@ -1,4 +1,8 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:hike_mates/features/gui/constants/map_camera_position.dart';
+import 'package:hike_mates/features/gui/controllers/map_string_controller.dart';
+import 'package:logger/logger.dart';
+import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:flutter/material.dart';
 import 'package:hike_mates/features/gui/ui/drawer/drawer.dart';
 import 'package:hike_mates/features/gui/ui/drawer/emergency_contacts.dart';
@@ -6,13 +10,15 @@ import 'package:hike_mates/features/gui/ui/routers/app_router.dart';
 
 @RoutePage()
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomepageState();
 }
 
 class _HomepageState extends State<HomePage> {
+  final logger = Logger();
+
   void _showAlert() {
     // logic forr the alert notif
     showDialog(
@@ -43,6 +49,21 @@ class _HomepageState extends State<HomePage> {
     // );
   }
 
+  String? _getStyleKey() {
+    String? style = "";
+    Future.delayed(const Duration(milliseconds: 200), () async {
+      style = await Config.getStyleKey();
+      logger.d(style);
+
+      return style;
+    });
+
+    logger.d(
+      const String.fromEnvironment("ACCESS_TOKEN"),
+    );
+    // return style;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,6 +78,11 @@ class _HomepageState extends State<HomePage> {
       drawer: const MyDrawer(),
       body: Stack(
         children: [
+          MapboxMap(
+            styleString: _getStyleKey(),
+            accessToken: const String.fromEnvironment('ACCESS_TOKEN'),
+            initialCameraPosition: MapCameraPositions.kInitialCameraPostion,
+          ),
           Align(
             alignment: Alignment.centerRight,
             child: Column(

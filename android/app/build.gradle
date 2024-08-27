@@ -49,6 +49,7 @@ android {
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        buildConfigField "String", "MAP_STYLE_STRING", "\"${project.MAP_STYLE_STRING}\""
     }
 
     buildTypes {

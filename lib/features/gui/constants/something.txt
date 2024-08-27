@@ -1,0 +1,7 @@
+sk.eyJ1IjoiaGlrZW1hdGVzY2RhMjQyNSIsImEiOiJjbTBieXZmaTUwYzhhMmpzajY2bGVnYjJ6In0.JXvahHouKBeAaUV5fydv4A
+mapbox://styles/hikematescda2425/cm0bz0h0y00je01om4svlb7u5
+
+121.921753, 12.297930
+
+
+flutter run --dart-define ACCESS_TOKEN=sk.eyJ1IjoiaGlrZW1hdGVzY2RhMjQyNSIsImEiOiJjbTBieXZmaTUwYzhhMmpzajY2bGVnYjJ6In0.JXvahHouKBeAaUV5fydv4A

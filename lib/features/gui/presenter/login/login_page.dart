@@ -1,19 +1,41 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:hike_mates/features/gui/ui/routers/app_router.dart';
+import 'package:logger/logger.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 @RoutePage()
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key, required String title});
+  const LoginPage({super.key});
 
   @override
   State<LoginPage> createState() => _LoginPage();
 }
 
 class _LoginPage extends State<LoginPage> {
+  final logger = Logger();
   final _formkey = GlobalKey<FormState>();
   final TextEditingController _emailInput = TextEditingController();
   final TextEditingController _passInput = TextEditingController();
   bool _passwordVisi = false;
+  bool _isLoggedIn = false;
+
+  @override
+  void initState() {
+    super.initState();
+    logger.d("THIS IS IS INIT");
+    Future.delayed(Duration(milliseconds: 200), () async {
+      await checkLoginStatus();
+    });
+  }
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    _passInput.dispose();
+    _emailInput.dispose();
+    super.dispose();
+  }
 
   String? _validateEmail(String? email) {
     RegExp emailRegex = RegExp(r'^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$');
@@ -31,16 +53,51 @@ class _LoginPage extends State<LoginPage> {
     return null;
   }
 
-  @override
-  void dispose() {
-    // Clean up the controller when the widget is disposed.
-    _passInput.dispose();
-    _emailInput.dispose();
-    super.dispose();
+  void _loginMethod() async {
+    final SharedPreferences _prefs = await SharedPreferences.getInstance();
+    try {
+      await _prefs.setString('username', _emailInput.text.toString());
+      await _prefs.setString('password', _emailInput.text.toString());
+      await _prefs.setBool('isLoggin', true);
+
+      logger.d(_prefs.getString('username'));
+      logger.d(_prefs.getBool('isLoggin'));
+
+      if (_prefs.getBool('isLoggin') ?? false) {
+        AutoRouter.of(context)
+            .push(HomeRoute(isLoggedIn: _prefs.getBool('isLoggin')!));
+      }
+    } on Exception catch (e) {
+      // TODO
+      logger.e(e);
+    }
+  }
+
+  Future<void> checkLoginStatus() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    logger.d("THIS IS IS CHECKING LOGIN STATUS");
+
+    setState(() {
+      final bool isLoggedIn = prefs.getBool('isLoggin') ?? false;
+      // final String? username = prefs.getString('username');
+      // final String? password = prefs.getString('password');
+
+      _isLoggedIn = isLoggedIn;
+
+      logger.d(_isLoggedIn);
+
+      if (isLoggedIn) {
+        // Navigate to the main page or dashboard
+        AutoRouter.of(context).push(HomeRoute(isLoggedIn: _isLoggedIn));
+      }
+    });
+// Again, be cautious with passwords
   }
 
   @override
   Widget build(BuildContext context) {
+    double _width = MediaQuery.of(context).size.width;
+    double _height = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: const Color.fromRGBO(48, 48, 48, 48),
       body: SingleChildScrollView(
@@ -49,13 +106,16 @@ class _LoginPage extends State<LoginPage> {
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(20, 70, 20, 20),
+                padding: const EdgeInsets.fromLTRB(30, 100, 30, 20),
                 child: Column(
                   children: [
                     CircleAvatar(
                       radius: 70,
                       backgroundImage: NetworkImage(
                           "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRWS51CD9zsglzLVjpYo0klGhkkdCgQty9-CA&s"),
+                    ),
+                    const SizedBox(
+                      height: 24,
                     ),
                     const ListTile(
                       title: Center(
@@ -67,7 +127,11 @@ class _LoginPage extends State<LoginPage> {
                       subtitle: Center(
                           child: Text(
                               "Welcome to Carpe Diem Adventure Emergency Assistance!",
+                              textAlign: TextAlign.center,
                               style: TextStyle(color: Colors.white))),
+                    ),
+                    const SizedBox(
+                      height: 24,
                     ),
                     TextFormField(
                       controller: _emailInput,
@@ -117,19 +181,25 @@ class _LoginPage extends State<LoginPage> {
                     ),
                     ElevatedButton(
                         style: ElevatedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
                             backgroundColor: Colors.orange),
-                        onPressed: () {},
-                        child: const SizedBox(
-                          width: 118,
-                          child: ListTile(
+                        onPressed: _loginMethod,
+                        child: SizedBox(
+                          width: _width,
+                          child: const ListTile(
                             title: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text("Login",
                                     style: TextStyle(color: Colors.white)),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Icon(Icons.login)
                               ],
                             ),
-                            trailing: Icon(Icons.login),
+                            // trailing: Icon(Icons.login),
                           ),
                         )),
                   ],

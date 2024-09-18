@@ -40,6 +40,14 @@ dependencies:
   #providers
   auto_route: ^7.8.3
   logger: ^2.0.2+1
+  url_launcher: ^6.3.0
+  permission_handler: 
+  location: ^5.0.0
+  android_intent_plus: 
+  shared_preferences: ^2.3.0
+
+
+
 
   mapbox_gl_platform_interface:
     git:
@@ -66,6 +74,7 @@ dev_dependencies:
   flutter_dotenv: ^5.1.0
 
   flutter_launcher_icons: ^0.13.1
+  
 
 
   
@@ -73,6 +82,14 @@ dev_dependencies:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
+
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  adaptive_icon_background : "#FFFFFF"
+
+  ios: true
+  image_path: "assets/logo/logo.png"
 
 # The following section is specific to Flutter packages.
 flutter:

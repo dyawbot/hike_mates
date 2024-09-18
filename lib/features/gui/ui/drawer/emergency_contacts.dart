@@ -1,5 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'add_contact_page.dart'; // Import the AddContactPage
 
 @RoutePage()
@@ -12,6 +14,7 @@ class EmergencyContactsScreenPage extends StatefulWidget {
 }
 
 class _EmergencyContactsScreenState extends State<EmergencyContactsScreenPage> {
+  final logger = Logger();
   final List<Map<String, String?>> _contacts = [
     {
       'name': 'National Emergency Hotline',
@@ -72,6 +75,17 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreenPage> {
     });
   }
 
+  void _emergencyCall(String number) async {
+    final Uri phoneUrl = Uri(scheme: "tel", path: number);
+
+    if (await canLaunchUrl(phoneUrl)) {
+      await launchUrl(phoneUrl);
+    } else {
+      // Handle the error, e.g., show a message to the user
+      logger.e('Could not launch $phoneUrl');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -91,7 +105,7 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreenPage> {
             padding: const EdgeInsets.all(16),
             child: GestureDetector(
               onTap: _addContact,
-              child: Row(
+              child: const Row(
                 children: [
                   CircleAvatar(
                     radius: 20,
@@ -102,8 +116,8 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreenPage> {
                       color: Colors.white,
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  const Text(
+                  SizedBox(width: 8),
+                  Text(
                     'Add New',
                     style: TextStyle(
                       fontSize: 16,
@@ -123,6 +137,12 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreenPage> {
               itemBuilder: (context, index) {
                 final contact = _contacts[index];
                 return ListTile(
+                  onTap: () {
+                    logger.d(_contacts[index]["phone"]);
+                    String number = _contacts[index]["phone"]!;
+
+                    _emergencyCall(number);
+                  },
                   leading: CircleAvatar(
                     backgroundImage: contact['photo'] != null
                         ? AssetImage(contact['photo']!)

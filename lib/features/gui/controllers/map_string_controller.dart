@@ -6,10 +6,10 @@ class Config {
       MethodChannel("com.example.hike_mates/config");
 
   static Future<String?> getStyleKey() async {
-    final logger = Logger();
+    // final logger = Logger();
 
     final String? styleKey = await _channel.invokeMethod('getStyleKey');
-    logger.d(styleKey);
+    // logger.d(styleKey);
     return styleKey;
   }
 }

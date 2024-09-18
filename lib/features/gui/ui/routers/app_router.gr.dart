@@ -22,21 +22,37 @@ abstract class _$AppRouter extends RootStackRouter {
       );
     },
     HomeRoute.name: (routeData) {
-      final args =
-          routeData.argsAs<HomeRouteArgs>(orElse: () => const HomeRouteArgs());
+      final args = routeData.argsAs<HomeRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: HomePage(key: args.key),
+        child: HomePage(
+          args.isLoggedIn,
+          key: args.key,
+        ),
       );
     },
     LoginRoute.name: (routeData) {
-      final args = routeData.argsAs<LoginRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: LoginPage(
-          key: args.key,
-          title: args.title,
-        ),
+        child: const LoginPage(),
+      );
+    },
+    PrivacyPolicyRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const PrivacyPolicyPage(),
+      );
+    },
+    SettingsRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const SettingsPage(),
+      );
+    },
+    TermsConditionsRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const TermsConditionsPage(),
       );
     },
   };
@@ -60,11 +76,15 @@ class EmergencyContactsRouteRoute extends PageRouteInfo<void> {
 /// [HomePage]
 class HomeRoute extends PageRouteInfo<HomeRouteArgs> {
   HomeRoute({
+    required bool isLoggedIn,
     Key? key,
     List<PageRouteInfo>? children,
   }) : super(
           HomeRoute.name,
-          args: HomeRouteArgs(key: key),
+          args: HomeRouteArgs(
+            isLoggedIn: isLoggedIn,
+            key: key,
+          ),
           initialChildren: children,
         );
 
@@ -74,49 +94,73 @@ class HomeRoute extends PageRouteInfo<HomeRouteArgs> {
 }
 
 class HomeRouteArgs {
-  const HomeRouteArgs({this.key});
+  const HomeRouteArgs({
+    required this.isLoggedIn,
+    this.key,
+  });
+
+  final bool isLoggedIn;
 
   final Key? key;
 
   @override
   String toString() {
-    return 'HomeRouteArgs{key: $key}';
+    return 'HomeRouteArgs{isLoggedIn: $isLoggedIn, key: $key}';
   }
 }
 
 /// generated route for
 /// [LoginPage]
-class LoginRoute extends PageRouteInfo<LoginRouteArgs> {
-  LoginRoute({
-    Key? key,
-    required String title,
-    List<PageRouteInfo>? children,
-  }) : super(
+class LoginRoute extends PageRouteInfo<void> {
+  const LoginRoute({List<PageRouteInfo>? children})
+      : super(
           LoginRoute.name,
-          args: LoginRouteArgs(
-            key: key,
-            title: title,
-          ),
           initialChildren: children,
         );
 
   static const String name = 'LoginRoute';
 
-  static const PageInfo<LoginRouteArgs> page = PageInfo<LoginRouteArgs>(name);
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
-class LoginRouteArgs {
-  const LoginRouteArgs({
-    this.key,
-    required this.title,
-  });
+/// generated route for
+/// [PrivacyPolicyPage]
+class PrivacyPolicyRoute extends PageRouteInfo<void> {
+  const PrivacyPolicyRoute({List<PageRouteInfo>? children})
+      : super(
+          PrivacyPolicyRoute.name,
+          initialChildren: children,
+        );
 
-  final Key? key;
+  static const String name = 'PrivacyPolicyRoute';
 
-  final String title;
+  static const PageInfo<void> page = PageInfo<void>(name);
+}
 
-  @override
-  String toString() {
-    return 'LoginRouteArgs{key: $key, title: $title}';
-  }
+/// generated route for
+/// [SettingsPage]
+class SettingsRoute extends PageRouteInfo<void> {
+  const SettingsRoute({List<PageRouteInfo>? children})
+      : super(
+          SettingsRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'SettingsRoute';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
+/// [TermsConditionsPage]
+class TermsConditionsRoute extends PageRouteInfo<void> {
+  const TermsConditionsRoute({List<PageRouteInfo>? children})
+      : super(
+          TermsConditionsRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'TermsConditionsRoute';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
 }

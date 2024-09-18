@@ -1,5 +1,8 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:hike_mates/features/gui/ui/routers/app_router.dart';
 
+@RoutePage()
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
@@ -35,7 +38,8 @@ class SettingsPage extends StatelessWidget {
               dense: true,
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 16, right: 16, bottom: 0), // Remove bottom padding
+              padding: const EdgeInsets.only(
+                  left: 16, right: 16, bottom: 0), // Remove bottom padding
               child: Divider(
                 color: Colors.grey[300],
                 thickness: 1,
@@ -45,7 +49,8 @@ class SettingsPage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 4),
               child: SwitchListTile(
-                contentPadding: EdgeInsets.zero, // Removes the extra padding inside the SwitchListTile
+                contentPadding: EdgeInsets
+                    .zero, // Removes the extra padding inside the SwitchListTile
                 value: isDarkMode,
                 onChanged: (bool value) {
                   // Handle dark mode toggle
@@ -62,7 +67,8 @@ class SettingsPage extends StatelessWidget {
             ),
             // Others Section
             ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               leading: Icon(Icons.settings, color: Colors.black),
               title: Text(
                 'Others',
@@ -75,7 +81,8 @@ class SettingsPage extends StatelessWidget {
               dense: true,
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 16, right: 16, bottom: 0), // Remove bottom padding
+              padding: const EdgeInsets.only(
+                  left: 16, right: 16, bottom: 0), // Remove bottom padding
               child: Divider(
                 color: Colors.grey[300],
                 thickness: 1,
@@ -103,7 +110,8 @@ class SettingsPage extends StatelessWidget {
                       size: 16,
                     ),
                     onTap: () {
-                      Navigator.of(context).pushNamed('/privacy_policy');
+                      // Navigator.of(context).pushNamed('/privacy_policy');
+                      AutoRouter.of(context).push(PrivacyPolicyRoute());
                     },
                   ),
                   const SizedBox(height: 10), // Small space between items
@@ -123,7 +131,8 @@ class SettingsPage extends StatelessWidget {
                       size: 16,
                     ),
                     onTap: () {
-                      Navigator.of(context).pushNamed('/terms_conditions');
+                      // Navigator.of(context).pushNamed('/terms_conditions');
+                      AutoRouter.of(context).push(TermsConditionsRoute());
                     },
                   ),
                 ],

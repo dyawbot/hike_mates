@@ -10,7 +10,7 @@ import 'package:logger/logger.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:flutter/material.dart';
 import 'package:hike_mates/features/gui/ui/drawer/drawer.dart';
-import 'package:hike_mates/features/gui/ui/drawer/emergency_contacts.dart';
+// import 'package:hike_mates/features/gui/ui/drawer/emergency_contacts.dart';
 import 'package:hike_mates/features/gui/ui/routers/app_router.dart';
 import 'package:permission_handler/permission_handler.dart';
 

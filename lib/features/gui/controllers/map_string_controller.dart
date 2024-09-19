@@ -1,5 +1,5 @@
 import 'package:flutter/services.dart';
-import 'package:logger/logger.dart';
+// import 'package:logger/logger.dart';
 
 class Config {
   static const MethodChannel _channel =

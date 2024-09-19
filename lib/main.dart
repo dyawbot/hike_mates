@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hike_mates/common/app_module.dart';
 import 'package:hike_mates/features/gui/ui/drawer/emergency_contacts.dart';
 import 'package:hike_mates/features/gui/ui/drawer/privacy_policy.dart';
 import 'package:hike_mates/features/gui/ui/drawer/terms_conditions.dart';
@@ -8,8 +9,10 @@ import 'package:hike_mates/features/gui/ui/drawer/settings_page.dart';
 import 'package:hike_mates/features/gui/ui/routers/app_router.dart';
 // Import the new pages for Privacy Policy and Terms and Conditions
 
-void main() {
-  runApp(MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  configureDependencies().then((value) => runApp(MyApp()));
 }
 
 class MyApp extends StatelessWidget {

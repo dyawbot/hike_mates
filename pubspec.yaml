@@ -47,6 +47,23 @@ dependencies:
   shared_preferences: ^2.3.0
 
 
+  json_annotation: ^4.8.1
+  flutter_bloc:
+  equatable:
+  floor: ^1.4.1
+  injectable: ^2.3.0
+
+  http:
+  dio:
+  retrofit:
+  get_it: ^7.6.2
+  internet_connection_checker: ^1.0.0+1
+
+
+
+
+
+
 
 
   mapbox_gl_platform_interface:
@@ -74,7 +91,12 @@ dev_dependencies:
   flutter_dotenv: ^5.1.0
 
   flutter_launcher_icons: ^0.13.1
-  
+  json_serializable: any
+  floor_generator:
+  injectable_generator: ^2.4.0
+  retrofit_generator: ^7.0.8
+
+  mockito:
 
 
   

@@ -38,6 +38,6 @@ class DeleteUserEmergencyContactUsecase extends Usecase<
 
   DeleteUserEmergencyContactUsecase(this._repository);
   @override
-  call(DeleteNumberParams index) =>
-      _repository.deleteUserEmergencyContactRepository(index);
+  call(DeleteNumberParams params) =>
+      _repository.deleteUserEmergencyContactRepository(params);
 }

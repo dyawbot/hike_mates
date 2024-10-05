@@ -27,6 +27,7 @@ class UserLocationRepoImpl extends UserLocationRepository {
     DateFormat formatter = DateFormat('dd.MM.yyyy-HH:mm');
     String formattedDate = formatter.format(now);
     try {
+      logger.d(params);
       var response = await userLocationApi.postUserLocationApi(
           url: url,
           lati: params.lati,
@@ -44,7 +45,7 @@ class UserLocationRepoImpl extends UserLocationRepository {
               )
               .toList();
 
-          logger.d(data);
+          // logger.d(data);
 
           if (message == "Data retrieved successfully.") {
             return ApiResult.success(data);
@@ -73,8 +74,9 @@ class UserLocationRepoImpl extends UserLocationRepository {
   Future<ApiResult<List<UserLocationEntity>>> getAllUserLocation(
       CheckHikeUserParams params) async {
     String url = WebUrsl.url;
-
     if (params.hikeCode != null) {
+      // logger.d(params.hikeCode);
+      // logger.d(params.userId);
       try {
         var response = await getAllLocationApi.getAllUserLocationApi(
           url: url,
@@ -85,11 +87,10 @@ class UserLocationRepoImpl extends UserLocationRepository {
         if (response.message != null) {
           if (response.data != null) {
             var message = response.message!;
-            var data = response.data!
-                .map(
-                  (e) => e.toEntity(),
-                )
-                .toList();
+            // for (var i in response.data!) {
+            //   logger.d(i.fullname);
+            // }
+            var data = response.data!.map((e) => e.toEntity()).toList();
 
             if (message == "Data retrieved successfully.") {
               return ApiResult.success(data);

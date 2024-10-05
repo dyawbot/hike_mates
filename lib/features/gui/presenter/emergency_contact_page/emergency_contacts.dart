@@ -1,11 +1,10 @@
-// ignore_for_file: library_private_types_in_public_api
+// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
 
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hike_mates/features/domain/parameters/user_contact_emergency_params.dart';
 import 'package:hike_mates/features/gui/presenter/emergency_contact_page/emergency_contact_page_bloc.dart';
-import 'package:hike_mates/features/gui/presenter/login/login_page_bloc.dart';
 
 import 'package:logger/logger.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -49,7 +48,7 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreenPage> {
   void _addContact() async {
     final newContact = await Navigator.of(context).push<Map<String, String?>>(
       MaterialPageRoute(
-        builder: (context) => AddContactPage(),
+        builder: (context) => const AddContactPage(),
       ),
     );
     logger.d(newContact);
@@ -118,7 +117,6 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreenPage> {
     return BlocConsumer<EmergencyContactPageBloc, EmergencyContactPageState>(
       bloc: _bloc,
       listener: (context, state) {
-        // TODO: implement listener
         logger.d(state);
 
         if (state is AddEmergencyContactPageState) {
@@ -206,7 +204,7 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreenPage> {
 
                         _emergencyCall(number);
                       },
-                      leading: Icon(
+                      leading: const Icon(
                         Icons.people,
                         size: 48,
                       ),

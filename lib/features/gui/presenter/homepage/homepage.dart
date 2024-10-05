@@ -18,6 +18,7 @@ import 'package:hike_mates/features/gui/controllers/map_string_controller.dart';
 import 'package:hike_mates/features/gui/presenter/homepage/home_page_bloc.dart';
 import 'package:hike_mates/features/gui/ui/widget/custo_alert_dialog.dart';
 import 'package:hike_mates/features/gui/ui/widget/generate_share_code.dart';
+
 import 'package:location/location.dart';
 import 'package:logger/logger.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
@@ -64,6 +65,8 @@ class _HomepageState extends State<HomePage> {
   Set<dynamic> existingUserIds = {};
 
   List<LatLng> locatS = [];
+  List<Offset> markerPositions = [];
+  late LatLng latLngData;
 
   late String generateHikeCode;
   final TextEditingController inputCode = TextEditingController();
@@ -352,7 +355,7 @@ class _HomepageState extends State<HomePage> {
     double longi = userLocation.position.longitude;
     LatLng myLoc = LatLng(lat, longi);
 
-    // logger.d(myLoc);
+    logger.d(myLoc);
 
     if (_mapController != null) {
       // ignore: unused_local_variable
@@ -370,7 +373,7 @@ class _HomepageState extends State<HomePage> {
           hikeCode: generateHikeCode,
           userId: widget.userId);
 
-      // logger.d(params);
+      logger.d(params);
       _homeBloc.add(SaveUserLocationEvent(params));
     }
     // Point points = await
@@ -380,7 +383,7 @@ class _HomepageState extends State<HomePage> {
 
   Future<void> myAsyncFunction() async {
     // logger.e('Starting...');
-    await Future.delayed(const Duration(milliseconds: 2000));
+    await Future.delayed(const Duration(milliseconds: 500));
     // logger.e('Function completed.');
   }
 
@@ -390,17 +393,34 @@ class _HomepageState extends State<HomePage> {
   }
 
   void addMarkers() async {
-    for (LatLng location in locatS) {
-      if (!_mapController!.symbols
-          .any((symbol) => symbol.options.geometry == location)) {
-        await _mapController!.addSymbol(
-          SymbolOptions(
-            geometry: location,
-            iconImage: "assets/marker.png",
-            iconSize: 1.5,
-          ),
-        );
-        // logger.f("HELLO");
+    // logger.d(data);
+    // var loc = data.map((e) => e["locations"]).toList();
+
+    if (_mapController!.symbols.isNotEmpty) {
+      await _mapController!.clearSymbols();
+    }
+    for (var entry in data) {
+      var name = entry["name"];
+      var location = entry["locations"];
+
+      if (location is LatLng) {
+        if (!_mapController!.symbols
+            .any((symbol) => symbol.options.geometry == location)) {
+          await _mapController!.addSymbol(
+            SymbolOptions(
+                geometry: location,
+                iconImage: "assets/marker.png",
+                iconSize: 2,
+                textOpacity: 0.5,
+                textAnchor: "bottom",
+                textHaloColor: "#99FFFF",
+                textHaloWidth: 10.0, // The width of the halo (in pixels)
+                textHaloBlur: 2,
+                textColor: "#F00000",
+                textTransform: "uppercase",
+                textField: name),
+          );
+        }
       }
     }
   }
@@ -411,23 +431,8 @@ class _HomepageState extends State<HomePage> {
       Future.delayed(const Duration(milliseconds: 1000)).then((value) {
         addMarkers();
       });
-      // addMarkers();
     });
-
-    // await _mapController!.addSymbol(
-    //   SymbolOptions(
-    //     iconSize: 0.3,
-    //     iconImage: "marker",
-    //     geometry: locat[0],
-    //     iconAnchor: "bottom",
-    //   ),
-    // );
   }
-
-  // Future<Uint8List> loadMarkerImage() async {
-  //   var byteData = await rootBundle.load("assets/marker.png");
-  //   return byteData.buffer.asUint8List();
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -440,35 +445,35 @@ class _HomepageState extends State<HomePage> {
         // logger.d(state);
         if (state is HomeHikeCodeSuccessState) {
           setState(() {
-            // logger.d(state.codeEntity.code);
             generateHikeCode == state.codeEntity.code;
-            // logger.d(generateHikeCode);
           });
         }
         if (state is HomeSaveAllLocationState) {
-          // logger.d(state.userLocationEntity);
           setState(() {
             for (var e in state.userLocationEntity) {
-              // logger.d(e.lati);
-              // logger.d(e.longi);
-              if (!existingUserIds.contains(e.userId)) {
-                existingUserIds.add(e.userId);
+              latLngData =
+                  LatLng(double.tryParse(e.lati!)!, double.tryParse(e.longi!)!);
 
-                var latLng = {
-                  "lat": e.lati,
-                  "longi": e.longi,
-                  "userId": e.userId
-                };
+              var latLng = {
+                "userId": e.userId,
+                "name": e.name,
+                "locations": latLngData
+              };
 
-                LatLng latLngs = LatLng(
-                    double.tryParse(e.lati!)!, double.tryParse(e.longi!)!);
-
+              int index = data.indexWhere((d) => d['userId'] == e.userId);
+              if (index != -1) {
+                data[index] = latLng;
+              } else {
                 data.add(latLng);
-                locatS.add(latLngs);
+                existingUserIds.add(e.userId);
               }
+
+              locatS.add(latLngData);
             }
-            // logger.e("THIS IS FUCKING ANNOYING $locatS");
+
+            // logger.d(data);
           });
+
           addMarkers();
         }
 
@@ -516,6 +521,29 @@ class _HomepageState extends State<HomePage> {
                   myLocationRenderMode: MyLocationRenderMode.NORMAL,
                 ),
               ),
+              // ...markerPositions.map((position) {
+              //   return Positioned(
+              //     left: position.dx - 30, // Adjust horizontal position
+              //     top: position.dy - 60, // Adjust vertical position
+              //     child: Column(
+              //       children: [
+              //         Text(
+              //           "Location Label", // Replace with dynamic label if needed
+              //           style: TextStyle(
+              //             fontSize: 16,
+              //             fontWeight: FontWeight.bold,
+              //             color: Colors.black,
+              //           ),
+              //         ),
+              //         Icon(
+              //           Icons.location_on,
+              //           size: 30,
+              //           color: Colors.red,
+              //         ),
+              //       ],
+              //     ),
+              //   );
+              // }).toList(),
               Align(
                 alignment: Alignment.centerRight,
                 child: Column(

@@ -15,14 +15,15 @@ class UserLocationDto extends AppDto {
   final String? hikeCode;
   @JsonKey(name: "user_alert_data")
   final String? userAlertData;
+  final String? fullname;
 
-  UserLocationDto({
-    this.userId,
-    this.lo,
-    this.la,
-    this.hikeCode,
-    this.userAlertData,
-  });
+  UserLocationDto(
+      {this.userId,
+      this.lo,
+      this.la,
+      this.hikeCode,
+      this.userAlertData,
+      this.fullname});
   // UserLocationDto({this.userId, this.la, this.lo, this.userAlertData});
   @override
   UserLocationEntity toEntity() => UserLocationEntity(
@@ -30,6 +31,7 @@ class UserLocationDto extends AppDto {
         lati: la,
         longi: lo,
         hikeCode: hikeCode,
+        name: fullname,
       );
 
   factory UserLocationDto.fromJson(Map<String, dynamic> json) =>

@@ -1,7 +1,7 @@
 import 'package:hike_mates/common/api_result.dart';
 import 'package:hike_mates/features/data/dao/login_dao.dart';
 import 'package:hike_mates/features/data/dao/user_emergency_contact_dao.dart';
-import 'package:hike_mates/features/data/dao/user_hike_code_dao.dart';
+
 import 'package:hike_mates/features/data/repo/interface/user_emergency_contact_repository.dart';
 import 'package:hike_mates/features/domain/entity/user_emergency_contact_entity.dart';
 import 'package:hike_mates/features/domain/parameters/user_contact_emergency_params.dart';
@@ -29,7 +29,7 @@ class UserEmergencyContactRepoImpl extends UserEmergencyContactRepository {
 
       // var userData = await loginDao.getLogin();
       var paramsData = UserEmergencyContactEntity(
-          params.contactName, params.phoneNumber, userData!.userId!);
+          params.contactName, params.phoneNumber, userData.userId!);
 
       await userEmergencyContactDao.insert(paramsData);
       logger.d("asdasdsfadfgadsg");

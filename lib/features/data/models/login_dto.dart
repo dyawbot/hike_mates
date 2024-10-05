@@ -1,5 +1,4 @@
 import 'package:hike_mates/features/data/models/app_dto.dart';
-import 'package:hike_mates/features/domain/entity/app_entity.dart';
 import 'package:hike_mates/features/domain/entity/login_entity.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -10,25 +9,28 @@ class LoginDto extends AppDto {
   final String username;
   final String? message;
   final String? token;
+  final int? userId;
+  final String? firstName;
+  final String? lastName;
+  final String? phoneNumber;
 
-  LoginDto(this.username, {this.message, this.token});
+  LoginDto(this.username,
+      {this.message,
+      this.token,
+      this.userId,
+      this.firstName,
+      this.lastName,
+      this.phoneNumber});
   @override
-  LoginEntity toEntity() => LoginEntity(username, token: token);
+  LoginEntity toEntity() => LoginEntity(username,
+      token: token,
+      userId: userId,
+      firstName: firstName,
+      lastName: lastName,
+      phoneNumber: phoneNumber);
 
   factory LoginDto.fromJson(Map<String, dynamic> json) =>
       _$LoginDtoFromJson(json);
 
   Map<String, dynamic> toJson() => _$LoginDtoToJson(this);
-}
-
-@JsonSerializable()
-class LoginDtoS {
-  LoginDto data;
-
-  LoginDtoS(this.data);
-
-  factory LoginDtoS.fromJson(Map<String, dynamic> json) =>
-      _$LoginDtoSFromJson(json);
-
-  Map<String, dynamic> toJson() => _$LoginDtoSToJson(this);
 }

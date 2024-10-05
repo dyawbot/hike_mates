@@ -14,3 +14,12 @@ class LoginUsecase
   @override
   call(LoginParams? params) => _repository.loginRepository(params);
 }
+
+@injectable
+class LogOutUsecase extends Usecase<Future<ApiResult<LoginEntity>>, NoParams> {
+  final SessionRepository _repository;
+
+  LogOutUsecase(this._repository);
+  @override
+  call(NoParams params) => _repository.logOutRepository();
+}

@@ -1,3 +1,5 @@
+// ignore_for_file: unused_local_variable, avoid_print
+
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
@@ -13,6 +15,7 @@ import 'login_api_test.mocks.dart';
 @GenerateMocks([Dio])
 void main() {
   late MockDio mockDio;
+
   late LoginApi loginApi;
 
   setUp(() {

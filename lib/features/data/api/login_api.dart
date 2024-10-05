@@ -1,12 +1,9 @@
-import 'dart:math';
-
 import 'package:dio/dio.dart';
 import 'package:hike_mates/common/web_urls.dart';
 import 'package:hike_mates/features/data/models/login_dto.dart';
 import 'package:injectable/injectable.dart';
-import 'package:logger/logger.dart';
+
 import 'package:retrofit/http.dart';
-import 'dart:convert';
 
 part 'login_api.g.dart';
 

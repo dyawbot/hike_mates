@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use, avoid_print
+
 import 'dart:developer';
 import 'dart:io';
 
@@ -9,9 +11,9 @@ abstract class AppRepository {
   ApiResult<T> parseError<T>(DioException e, {T? data}) {
     if (e.type == DioErrorType.unknown) {
       var err = e.error;
-      print("ON APP REPOSITORY $err");
-      print("***************** message ${e.message}");
-      print("***************** response ${e.response}");
+      // print("ON APP REPOSITORY $err");
+      // print("***************** message ${e.message}");
+      // print("***************** response ${e.response}");
       if (err is SocketException) {
         log("SocketException: ${e.message}");
         if (err.osError?.errorCode == 101) {

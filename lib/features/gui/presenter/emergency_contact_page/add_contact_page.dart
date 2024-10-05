@@ -1,5 +1,8 @@
+// ignore_for_file: library_private_types_in_public_api, no_leading_underscores_for_local_identifiers
+
 import 'dart:io';
 import 'package:flutter/material.dart';
+
 import 'package:image_picker/image_picker.dart';
 
 class AddContactPage extends StatefulWidget {
@@ -73,16 +76,7 @@ class _AddContactPageState extends State<AddContactPage> {
           children: [
             Row(
               children: [
-                CircleAvatar(
-                  radius: 30,
-                  backgroundImage: _image != null
-                      ? FileImage(_image!)
-                      : const AssetImage('lib/drawer/assets/placeholder.png') as ImageProvider,
-                  child: _image == null
-                      ? const Center(
-                        )
-                      : null,
-                ),
+                const Icon(Icons.people, size: 38),
                 const SizedBox(width: 16),
                 IconButton(
                   icon: const Icon(Icons.photo),

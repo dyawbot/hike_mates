@@ -7,7 +7,16 @@ abstract class LoginPageEvent extends Equatable {
 class GetLoginEvent extends LoginPageEvent {
   final LoginParams? params;
 
-  GetLoginEvent({this.params});
+  const GetLoginEvent({this.params});
+  @override
+  List<Object?> get props => [params];
+}
+
+class SaveHikeCodeEvent extends LoginPageEvent {
+  final HikeCodeParams? params;
+
+  const SaveHikeCodeEvent({this.params});
+
   @override
   List<Object?> get props => [params];
 }

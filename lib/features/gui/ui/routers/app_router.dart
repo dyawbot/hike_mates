@@ -1,9 +1,10 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
+import '../../../domain/entity/login_entity.dart';
 import '../../presenter/homepage/homepage.dart';
 import '../../presenter/login/login_page.dart';
-import '../drawer/emergency_contacts.dart';
+import '../../presenter/emergency_contact_page/emergency_contacts.dart';
 import '../drawer/privacy_policy.dart';
 import '../drawer/settings_page.dart';
 import '../drawer/terms_conditions.dart';

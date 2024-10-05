@@ -16,21 +16,36 @@ class LoginPageLoadingState extends LoginPageState {
 
 class LoginPageSuccessState extends LoginPageState {
   final LoginEntity loginEntity;
-  LoginPageSuccessState(this.loginEntity);
+  const LoginPageSuccessState(this.loginEntity);
   @override
   List<Object> get props => [loginEntity];
 }
 
 class LoginPageInternetErrorState extends LoginPageState {
   final String? message;
-  LoginPageInternetErrorState({this.message});
+  const LoginPageInternetErrorState({this.message});
   @override
   List<Object?> get props => [message];
 }
 
 class LoginPageErrorState extends LoginPageState {
   final String? message;
-  LoginPageErrorState({this.message});
+  const LoginPageErrorState({this.message});
   @override
   List<Object?> get props => [message];
+}
+
+class HikeCodeErrorState extends LoginPageState {
+  final String? message;
+  const HikeCodeErrorState({this.message});
+  @override
+  List<Object?> get props => [message];
+}
+
+class HikeCodeSuccessState extends LoginPageState {
+  final UserHikeCodeEntity codeEntity;
+  const HikeCodeSuccessState(this.codeEntity);
+
+  @override
+  List<Object?> get props => [codeEntity];
 }

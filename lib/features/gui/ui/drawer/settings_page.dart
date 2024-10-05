@@ -66,9 +66,8 @@ class SettingsPage extends StatelessWidget {
               ),
             ),
             // Others Section
-            ListTile(
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            const ListTile(
+              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               leading: Icon(Icons.settings, color: Colors.black),
               title: Text(
                 'Others',
@@ -104,14 +103,14 @@ class SettingsPage extends StatelessWidget {
                         color: Colors.black,
                       ),
                     ),
-                    trailing: Icon(
+                    trailing: const Icon(
                       Icons.arrow_forward_ios,
-                      color: const Color.fromRGBO(48, 48, 48, 1),
+                      color: Color.fromRGBO(48, 48, 48, 1),
                       size: 16,
                     ),
                     onTap: () {
                       // Navigator.of(context).pushNamed('/privacy_policy');
-                      AutoRouter.of(context).push(PrivacyPolicyRoute());
+                      AutoRouter.of(context).push(const PrivacyPolicyRoute());
                     },
                   ),
                   const SizedBox(height: 10), // Small space between items
@@ -125,14 +124,14 @@ class SettingsPage extends StatelessWidget {
                         color: Colors.black,
                       ),
                     ),
-                    trailing: Icon(
+                    trailing: const Icon(
                       Icons.arrow_forward_ios,
-                      color: const Color.fromRGBO(48, 48, 48, 1),
+                      color: Color.fromRGBO(48, 48, 48, 1),
                       size: 16,
                     ),
                     onTap: () {
                       // Navigator.of(context).pushNamed('/terms_conditions');
-                      AutoRouter.of(context).push(TermsConditionsRoute());
+                      AutoRouter.of(context).push(const TermsConditionsRoute());
                     },
                   ),
                 ],

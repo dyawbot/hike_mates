@@ -13,6 +13,9 @@ abstract class LoginDao extends AppDao<LoginEntity> {
   @Query("SELECT * FROM ${LoginEntity.tableName}")
   Future<LoginEntity?> getLogin();
 
+  @Query("SELECT * FROM ${LoginEntity.tableName} WHERE userId=:userId")
+  Future<LoginEntity?> getLoginById(int userId);
+
   @Query("DELETE FROM ${LoginEntity.tableName}")
   Future<void> deleteAllData();
 }

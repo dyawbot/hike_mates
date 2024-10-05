@@ -7,11 +7,11 @@ class CustomAlertDialog extends StatelessWidget {
   final bool actionCloseVisibility;
   final bool actionOkayVisibility;
   final String actionLabel;
-  Function()? onPressedCloseBtn;
-  Function()? onPressOkay;
+  final Function()? onPressedCloseBtn;
+  final Function()? onPressOkay;
   final Widget child;
 
-  CustomAlertDialog({
+  const CustomAlertDialog({
     Key? key,
     required this.colorMessage,
     required this.title,
@@ -68,6 +68,7 @@ class CustomAlertDialog extends StatelessWidget {
                   child: ElevatedButton(
                       style: ButtonStyle(
                           shape:
+                              // ignore: deprecated_member_use
                               MaterialStateProperty.all<RoundedRectangleBorder>(
                                   RoundedRectangleBorder(
                                       borderRadius:
@@ -84,6 +85,7 @@ class CustomAlertDialog extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         // primary: Colors.redAccent,
                         // onPrimary: Colors.black54,
+                        backgroundColor: Colors.orange,
                         shadowColor: Colors.redAccent,
                         shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(

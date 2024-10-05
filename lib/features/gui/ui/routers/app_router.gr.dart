@@ -16,9 +16,13 @@ abstract class _$AppRouter extends RootStackRouter {
   @override
   final Map<String, PageFactory> pagesMap = {
     EmergencyContactsRouteRoute.name: (routeData) {
+      final args = routeData.argsAs<EmergencyContactsRouteRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: const EmergencyContactsScreenPage(),
+        child: EmergencyContactsScreenPage(
+          args.userId,
+          key: args.key,
+        ),
       );
     },
     HomeRoute.name: (routeData) {
@@ -26,7 +30,9 @@ abstract class _$AppRouter extends RootStackRouter {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: HomePage(
-          args.isLoggedIn,
+          args.userId,
+          args.loginEntity,
+          hikeCode: args.hikeCode,
           key: args.key,
         ),
       );
@@ -60,29 +66,58 @@ abstract class _$AppRouter extends RootStackRouter {
 
 /// generated route for
 /// [EmergencyContactsScreenPage]
-class EmergencyContactsRouteRoute extends PageRouteInfo<void> {
-  const EmergencyContactsRouteRoute({List<PageRouteInfo>? children})
-      : super(
+class EmergencyContactsRouteRoute
+    extends PageRouteInfo<EmergencyContactsRouteRouteArgs> {
+  EmergencyContactsRouteRoute({
+    required int userId,
+    Key? key,
+    List<PageRouteInfo>? children,
+  }) : super(
           EmergencyContactsRouteRoute.name,
+          args: EmergencyContactsRouteRouteArgs(
+            userId: userId,
+            key: key,
+          ),
           initialChildren: children,
         );
 
   static const String name = 'EmergencyContactsRouteRoute';
 
-  static const PageInfo<void> page = PageInfo<void>(name);
+  static const PageInfo<EmergencyContactsRouteRouteArgs> page =
+      PageInfo<EmergencyContactsRouteRouteArgs>(name);
+}
+
+class EmergencyContactsRouteRouteArgs {
+  const EmergencyContactsRouteRouteArgs({
+    required this.userId,
+    this.key,
+  });
+
+  final int userId;
+
+  final Key? key;
+
+  @override
+  String toString() {
+    return 'EmergencyContactsRouteRouteArgs{userId: $userId, key: $key}';
+  }
 }
 
 /// generated route for
 /// [HomePage]
 class HomeRoute extends PageRouteInfo<HomeRouteArgs> {
   HomeRoute({
-    required bool isLoggedIn,
+    required int userId,
+    required LoginEntity loginEntity,
+    String? hikeCode,
     Key? key,
     List<PageRouteInfo>? children,
   }) : super(
           HomeRoute.name,
           args: HomeRouteArgs(
-            isLoggedIn: isLoggedIn,
+            userId: userId,
+            loginEntity: loginEntity,
+            hikeCode: hikeCode,
             key: key,
           ),
           initialChildren: children,
@@ -95,17 +130,23 @@ class HomeRoute extends PageRouteInfo<HomeRouteArgs> {
 
 class HomeRouteArgs {
   const HomeRouteArgs({
-    required this.isLoggedIn,
+    required this.userId,
+    required this.loginEntity,
+    this.hikeCode,
     this.key,
   });
 
-  final bool isLoggedIn;
+  final int userId;
+
+  final LoginEntity loginEntity;
+
+  final String? hikeCode;
 
   final Key? key;
 
   @override
   String toString() {
-    return 'HomeRouteArgs{isLoggedIn: $isLoggedIn, key: $key}';
+    return 'HomeRouteArgs{userId: $userId, loginEntity: $loginEntity, hikeCode: $hikeCode, key: $key}';
   }
 }
 

@@ -9,9 +9,18 @@ class LoginEntity extends AppEntity {
   final int primaryId = 1;
   final String username;
   final String? token;
+  final int? userId;
+  final String? firstName;
+  final String? lastName;
+  final String? phoneNumber;
 
-  LoginEntity(this.username, {this.token});
+  LoginEntity(this.username,
+      {this.token,
+      this.userId,
+      this.firstName,
+      this.lastName,
+      this.phoneNumber});
   @override
-  // TODO: implement props
-  List<Object?> get props => [primaryId, username, token];
+  List<Object?> get props =>
+      [primaryId, username, token, userId, firstName, lastName, phoneNumber];
 }

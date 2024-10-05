@@ -1,12 +1,14 @@
+// ignore_for_file: no_leading_underscores_for_local_identifiers, unused_local_variable
+
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:hike_mates/common/app_module.dart';
 import 'package:hike_mates/features/domain/parameters/login_params.dart';
 import 'package:hike_mates/features/gui/presenter/login/login_page_bloc.dart';
-import 'package:hike_mates/features/gui/ui/custo_alert_dialog.dart';
+import 'package:hike_mates/features/gui/ui/widget/custo_alert_dialog.dart';
 import 'package:hike_mates/features/gui/ui/routers/app_router.dart';
 import 'package:logger/logger.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 @RoutePage()
@@ -25,16 +27,15 @@ class _LoginPage extends State<LoginPage> {
   final TextEditingController _emailInput = TextEditingController();
   final TextEditingController _passInput = TextEditingController();
   bool _passwordVisi = false;
+  // ignore: prefer_final_fields, unused_field
   bool _isLoggedIn = false;
+  String? hikeCode;
 
   @override
   void initState() {
     super.initState();
     logger.d("THIS IS IS INIT");
-
-    Future.delayed(Duration(milliseconds: 200), () {
-      checkLoginStatus();
-    });
+    bloc.add(const SaveHikeCodeEvent());
   }
 
   @override
@@ -63,48 +64,14 @@ class _LoginPage extends State<LoginPage> {
 
   void _loginMethod() {
     var params =
-        LoginParams(_emailInput.text.toString(), _emailInput.text.toString());
+        LoginParams(_emailInput.text.toString(), _passInput.text.toString());
 
     bloc.add(GetLoginEvent(params: params));
-    // final SharedPreferences _prefs = await SharedPreferences.getInstance();
-    // try {
-    // await _prefs.setString('username', _emailInput.text.toString());
-    // await _prefs.setString('password', _emailInput.text.toString());
-    // await _prefs.setBool('isLoggin', true);
-
-    // logger.d(_prefs.getString('username'));
-    // logger.d(_prefs.getBool('isLoggin'));
-
-    //   if (_prefs.getBool('isLoggin') ?? false) {
-    //     AutoRouter.of(context)
-    //         .push(HomeRoute(isLoggedIn: _prefs.getBool('isLoggin')!));
-    //   }
-    // } on Exception catch (e) {
-    //   // TODO
-    //   logger.e(e);
-    // }
   }
 
-  void checkLoginStatus() {
-    bloc.add(GetLoginEvent());
-    // final SharedPreferences prefs = await SharedPreferences.getInstance();
-    // logger.d("THIS IS IS CHECKING LOGIN STATUS");
-
-    // setState(() {
-    //   final bool isLoggedIn = prefs.getBool('isLoggin') ?? false;
-    //   // final String? username = prefs.getString('username');
-    //   // final String? password = prefs.getString('password');
-
-    //   _isLoggedIn = isLoggedIn;
-
-    //   logger.d(_isLoggedIn);
-
-    //   if (isLoggedIn) {
-    //     // Navigate to the main page or dashboard
-    //     AutoRouter.of(context).push(HomeRoute(isLoggedIn: _isLoggedIn));
-    //   }
-    // });
-// Again, be cautious with passwords
+  void checkLoginStatus() async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    bloc.add(const GetLoginEvent());
   }
 
   @override
@@ -114,11 +81,21 @@ class _LoginPage extends State<LoginPage> {
     return BlocConsumer<LoginPageBloc, LoginPageState>(
       bloc: bloc,
       listener: (context, state) {
-        // TODO: implement listener
+        if (state is HikeCodeSuccessState) {
+          logger.d(state.codeEntity.code);
+          setState(() {
+            hikeCode = state.codeEntity.code;
+          });
 
-        logger.d(state);
+          checkLoginStatus();
+        }
+
         if (state is LoginPageSuccessState) {
-          AutoRouter.of(context).push(HomeRoute(isLoggedIn: true));
+          int userId = state.loginEntity.userId!;
+          AutoRouter.of(context).replace(HomeRoute(
+              userId: userId,
+              loginEntity: state.loginEntity,
+              hikeCode: hikeCode));
         }
 
         if (state is LoginPageInternetErrorState) {
@@ -138,8 +115,11 @@ class _LoginPage extends State<LoginPage> {
               builder: (context) {
                 return CustomAlertDialog(
                     colorMessage: Colors.red,
-                    title: "Error",
-                    child: Text(state.message!));
+                    title: "Credential Error",
+                    onPressedCloseBtn: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text("${state.message}"));
               });
         }
       },
@@ -155,7 +135,7 @@ class _LoginPage extends State<LoginPage> {
                     padding: const EdgeInsets.fromLTRB(30, 100, 30, 20),
                     child: Column(
                       children: [
-                        CircleAvatar(
+                        const CircleAvatar(
                           radius: 70,
                           backgroundImage: NetworkImage(
                               "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRWS51CD9zsglzLVjpYo0klGhkkdCgQty9-CA&s"),
@@ -202,7 +182,7 @@ class _LoginPage extends State<LoginPage> {
                           decoration: InputDecoration(
                               border: const OutlineInputBorder(),
                               labelText: "Password",
-                              labelStyle: TextStyle(color: Colors.white),
+                              labelStyle: const TextStyle(color: Colors.white),
                               suffixIcon: GestureDetector(
                                 onTap: () {
                                   setState(() {

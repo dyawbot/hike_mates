@@ -10,6 +10,7 @@ class GenerateShareCodeWidget extends StatelessWidget {
   final void Function() submitFunction;
   final void Function() generateCardFunction;
   final void Function() enterCodeFunction;
+  final void Function() closeFunction;
   const GenerateShareCodeWidget(this.hikeCode,
       {required this.controller,
       required this.isGenerated,
@@ -17,6 +18,7 @@ class GenerateShareCodeWidget extends StatelessWidget {
       required this.submitFunction,
       required this.generateCardFunction,
       required this.enterCodeFunction,
+      required this.closeFunction,
       super.key});
 
   @override
@@ -39,9 +41,7 @@ class GenerateShareCodeWidget extends StatelessWidget {
                 right: 0,
                 top: -8,
                 child: IconButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
+                    onPressed: closeFunction,
                     icon: const Icon(
                       fill: 1,
                       Icons.close,

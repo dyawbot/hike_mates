@@ -56,6 +56,7 @@ class _HomepageState extends State<HomePage> {
   bool isButtonEnabled = false;
   bool isGenerated = false;
   bool isEnterCode = false;
+  bool isLoading = false;
   double lat = 0.0;
   double lng = 0.0;
 
@@ -165,6 +166,12 @@ class _HomepageState extends State<HomePage> {
                   isGenerated: isGenerated,
                   submitFunction: _submitCode,
                   isEnterCode: isEnterCode,
+                  closeFunction: () {
+                    Navigator.pop(context);
+                    setState(() {
+                      generateHikeCode = "Hike Code";
+                    });
+                  },
                   generateCardFunction: () => _generateCodeFunction(setState),
                   enterCodeFunction: () => _enterCodeFunction(setState),
                 );
@@ -178,6 +185,9 @@ class _HomepageState extends State<HomePage> {
 
   void _generateCodeFunction(StateSetter setState) {
     int elapsedTime = 0;
+    setState(() {
+      isLoading = true;
+    });
 
     Timer.periodic(const Duration(milliseconds: 200), (timer) async {
       elapsedTime += 200;
@@ -188,6 +198,8 @@ class _HomepageState extends State<HomePage> {
         setState(() {
           isGenerated = true;
           isEnterCode = false;
+          isLoading = false;
+          Navigator.pop(context);
         });
       } else {
         setState(() {
@@ -200,6 +212,33 @@ class _HomepageState extends State<HomePage> {
         });
       }
     });
+
+    if (isLoading) {
+      showDialog(
+          context: context,
+          builder: (context) {
+            return const Dialog(
+              backgroundColor: Colors.transparent,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(
+                    color: Colors.orange,
+                  ),
+                  SizedBox(
+                    height: 30,
+                  ),
+                  Text(
+                    "Auto generating code, wait for a moment",
+                    style: TextStyle(color: Colors.white),
+                  )
+                ],
+              ),
+            );
+          });
+    } else {
+      Navigator.pop(context);
+    }
   }
 
   void _enterCodeFunction(StateSetter setState) {

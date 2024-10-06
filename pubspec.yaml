@@ -76,6 +76,9 @@ dependencies:
       url: https://github.com/tobrun/flutter-mapbox-gl.git
       # path: mapbox_g
 
+
+  flutter_debouncer: ^2.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

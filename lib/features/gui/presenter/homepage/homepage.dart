@@ -15,6 +15,7 @@ import 'package:hike_mates/features/domain/parameters/user_location_params.dart'
 import 'package:hike_mates/features/gui/constants/map_camera_position.dart';
 import 'package:hike_mates/features/gui/constants/string_random.dart';
 import 'package:hike_mates/features/gui/controllers/map_string_controller.dart';
+import 'package:hike_mates/features/gui/controllers/throll_debouncer_services.dart';
 import 'package:hike_mates/features/gui/presenter/homepage/home_page_bloc.dart';
 import 'package:hike_mates/features/gui/ui/widget/custo_alert_dialog.dart';
 import 'package:hike_mates/features/gui/ui/widget/generate_share_code.dart';
@@ -41,7 +42,8 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomepageState();
 }
 
-class _HomepageState extends State<HomePage> {
+class _HomepageState extends State<HomePage>
+    with ThrollService, DebounceService {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final _homeBloc = getIt<HomePageBloc>();
   final logger = Logger();
@@ -88,7 +90,7 @@ class _HomepageState extends State<HomePage> {
         generateHikeCode = hikeCode;
       }
     });
-    _timerRefresh = Timer.periodic(const Duration(seconds: 2), (timer) {
+    _timerRefresh = Timer.periodic(const Duration(seconds: 5), (timer) {
       _refreshData();
     });
   }
@@ -100,6 +102,93 @@ class _HomepageState extends State<HomePage> {
     _timerRefresh?.cancel();
 
     super.dispose();
+  }
+
+  void _locationUpdate(UserLocation userLocation) async {
+    double lat = userLocation.position.latitude;
+    double longi = userLocation.position.longitude;
+    LatLng myLoc = LatLng(lat, longi);
+
+    logger.d(myLoc);
+
+    if (_mapController != null) {
+      // ignore: unused_local_variable
+      Point point = await _mapController!.toScreenLocation(myLoc);
+      var radius = await _mapController!.getMetersPerPixelAtLatitude(lat);
+
+      if (isPressesLocation && radius > 75) {
+        await _mapController!.animateCamera(
+            CameraUpdate.newLatLngZoom(LatLng(lat, longi), _zoomLevel));
+      }
+
+      UserLocationParams params = UserLocationParams(
+          lati: lat.toString(),
+          longi: longi.toString(),
+          hikeCode: generateHikeCode,
+          userId: widget.userId);
+
+      logger.d(params);
+      _homeBloc.add(SaveUserLocationEvent(params));
+
+      throttleFunction(() {
+        logger.d(params);
+        _homeBloc.add(SaveUserLocationEvent(params));
+      });
+
+      debounceFunction(() {
+        logger.d("THIS IS MY DEBOUNCER CHECK: $myLoc");
+      });
+    }
+    // Point points = await
+  }
+
+  Future<bool> checkPermision(Permission permission) async {
+    // final permission = Permission.locationAlways;
+    final status = await permission.request();
+    if (status.isGranted) {
+      return true;
+    } else if (status.isLimited) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  void _onMapLocation() {
+    checkPermision(Permission.locationWhenInUse).then((value) async {
+      if (Platform.isAndroid) {
+        Location location = Location();
+        bool isLocationEnabled = await location.serviceEnabled();
+
+        if (!isLocationEnabled) {
+          const intent = AndroidIntent(
+              action: 'android.settings.LOCATION_SOURCE_SETTINGS');
+          await intent.launch();
+        }
+      }
+      // logger.d(value);
+
+      setState(() {
+        _zoomLevel = zoomLevel.clamp(minZoom, maxZoom);
+        showMyLocation = !showMyLocation;
+        isPressesLocation = !isPressesLocation;
+
+        if (isPressesLocation == true) {
+          isLocationActivated = true;
+        } else {
+          isLocationActivated = false;
+        }
+      });
+    });
+  }
+
+  _onMapCreated(MapboxMapController controller) async {
+    setState(() {
+      _mapController = controller;
+      Future.delayed(const Duration(milliseconds: 1000)).then((value) {
+        addMarkers();
+      });
+    });
   }
 
   void _refreshData() {
@@ -310,83 +399,6 @@ class _HomepageState extends State<HomePage> {
     });
   }
 
-  Future<bool> checkPermision(Permission permission) async {
-    // final permission = Permission.locationAlways;
-    final status = await permission.request();
-    if (status.isGranted) {
-      return true;
-    } else if (status.isLimited) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  void _onMapLocation() {
-    checkPermision(Permission.locationWhenInUse).then((value) async {
-      if (Platform.isAndroid) {
-        Location location = Location();
-        bool isLocationEnabled = await location.serviceEnabled();
-
-        if (!isLocationEnabled) {
-          const intent = AndroidIntent(
-              action: 'android.settings.LOCATION_SOURCE_SETTINGS');
-          await intent.launch();
-        }
-      }
-      // logger.d(value);
-
-      setState(() {
-        _zoomLevel = zoomLevel.clamp(minZoom, maxZoom);
-        showMyLocation = !showMyLocation;
-        isPressesLocation = !isPressesLocation;
-
-        if (isPressesLocation == true) {
-          isLocationActivated = true;
-        } else {
-          isLocationActivated = false;
-        }
-      });
-    });
-  }
-
-  void _locationUpdate(UserLocation userLocation) async {
-    double lat = userLocation.position.latitude;
-    double longi = userLocation.position.longitude;
-    LatLng myLoc = LatLng(lat, longi);
-
-    logger.d(myLoc);
-
-    if (_mapController != null) {
-      // ignore: unused_local_variable
-      Point point = await _mapController!.toScreenLocation(myLoc);
-      var radius = await _mapController!.getMetersPerPixelAtLatitude(lat);
-
-      if (isPressesLocation && radius > 75) {
-        await _mapController!.animateCamera(
-            CameraUpdate.newLatLngZoom(LatLng(lat, longi), _zoomLevel));
-      }
-
-      UserLocationParams params = UserLocationParams(
-          lati: lat.toString(),
-          longi: longi.toString(),
-          hikeCode: generateHikeCode,
-          userId: widget.userId);
-
-      logger.d(params);
-      _homeBloc.add(SaveUserLocationEvent(params));
-    }
-    // Point points = await
-
-    await myAsyncFunction();
-  }
-
-  Future<void> myAsyncFunction() async {
-    // logger.e('Starting...');
-    await Future.delayed(const Duration(milliseconds: 500));
-    // logger.e('Function completed.');
-  }
-
   void _onPressedActivate() {
     _onMapLocation();
     Navigator.pop(context);
@@ -423,15 +435,6 @@ class _HomepageState extends State<HomePage> {
         }
       }
     }
-  }
-
-  _onMapCreated(MapboxMapController controller) async {
-    setState(() {
-      _mapController = controller;
-      Future.delayed(const Duration(milliseconds: 1000)).then((value) {
-        addMarkers();
-      });
-    });
   }
 
   @override
@@ -521,29 +524,6 @@ class _HomepageState extends State<HomePage> {
                   myLocationRenderMode: MyLocationRenderMode.NORMAL,
                 ),
               ),
-              // ...markerPositions.map((position) {
-              //   return Positioned(
-              //     left: position.dx - 30, // Adjust horizontal position
-              //     top: position.dy - 60, // Adjust vertical position
-              //     child: Column(
-              //       children: [
-              //         Text(
-              //           "Location Label", // Replace with dynamic label if needed
-              //           style: TextStyle(
-              //             fontSize: 16,
-              //             fontWeight: FontWeight.bold,
-              //             color: Colors.black,
-              //           ),
-              //         ),
-              //         Icon(
-              //           Icons.location_on,
-              //           size: 30,
-              //           color: Colors.red,
-              //         ),
-              //       ],
-              //     ),
-              //   );
-              // }).toList(),
               Align(
                 alignment: Alignment.centerRight,
                 child: Column(

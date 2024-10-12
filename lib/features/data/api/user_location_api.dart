@@ -23,6 +23,7 @@ abstract class UserLocationApi {
     @Field("long") required String longi,
     @Field("userId") required int userId,
     @Field("hikeCode") required String hikeCode,
+    @Field("batteryStatus") required String batteryStatus,
     @Field("userDateLocUpdate") required userLocationUpdate,
   });
 }

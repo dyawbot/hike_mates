@@ -34,6 +34,7 @@ class UserLocationRepoImpl extends UserLocationRepository {
           longi: params.longi,
           hikeCode: params.hikeCode,
           userId: params.userId!,
+          batteryStatus: params.batteryStatus ?? "",
           userLocationUpdate: formattedDate);
 
       if (response.message != null) {

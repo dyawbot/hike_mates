@@ -11,10 +11,12 @@ class UserEmergencyContactEntity extends AppEntity {
   final int userId;
   final String contactName;
   final String phoneNumber;
+  final String imageFileName;
 
   UserEmergencyContactEntity(
     this.contactName,
     this.phoneNumber,
+    this.imageFileName,
     this.userId, {
     this.primaryId,
   });
@@ -24,5 +26,6 @@ class UserEmergencyContactEntity extends AppEntity {
         contactName,
         phoneNumber,
         userId,
+        imageFileName,
       ];
 }

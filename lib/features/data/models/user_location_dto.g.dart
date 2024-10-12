@@ -14,6 +14,7 @@ UserLocationDto _$UserLocationDtoFromJson(Map<String, dynamic> json) =>
       hikeCode: json['hike_code'] as String?,
       userAlertData: json['user_alert_data'] as String?,
       fullname: json['fullname'] as String?,
+      batteryStatus: json['battery_status'] as String?,
     );
 
 Map<String, dynamic> _$UserLocationDtoToJson(UserLocationDto instance) =>
@@ -24,6 +25,7 @@ Map<String, dynamic> _$UserLocationDtoToJson(UserLocationDto instance) =>
       'hike_code': instance.hikeCode,
       'user_alert_data': instance.userAlertData,
       'fullname': instance.fullname,
+      'battery_status': instance.batteryStatus,
     };
 
 UserLocationDataDto _$UserLocationDataDtoFromJson(Map<String, dynamic> json) =>

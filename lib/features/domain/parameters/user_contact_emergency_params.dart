@@ -4,14 +4,16 @@ class UserContactEmergencyParams extends Params {
   final int userId;
   final String contactName;
   final String phoneNumber;
+  final String imageFileName;
 
-  UserContactEmergencyParams(this.userId, this.contactName, this.phoneNumber);
+  UserContactEmergencyParams(
+    this.userId,
+    this.contactName,
+    this.phoneNumber,
+    this.imageFileName,
+  );
   @override
-  List<Object?> get props => [
-        userId,
-        contactName,
-        phoneNumber,
-      ];
+  List<Object?> get props => [userId, contactName, phoneNumber, imageFileName];
 }
 
 class DeleteNumberParams extends Params {

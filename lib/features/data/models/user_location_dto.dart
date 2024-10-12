@@ -17,22 +17,26 @@ class UserLocationDto extends AppDto {
   final String? userAlertData;
   final String? fullname;
 
+  @JsonKey(name: "battery_status")
+  final String? batteryStatus;
+
   UserLocationDto(
       {this.userId,
       this.lo,
       this.la,
       this.hikeCode,
       this.userAlertData,
-      this.fullname});
+      this.fullname,
+      this.batteryStatus});
   // UserLocationDto({this.userId, this.la, this.lo, this.userAlertData});
   @override
   UserLocationEntity toEntity() => UserLocationEntity(
-        userId: userId,
-        lati: la,
-        longi: lo,
-        hikeCode: hikeCode,
-        name: fullname,
-      );
+      userId: userId,
+      lati: la,
+      longi: lo,
+      hikeCode: hikeCode,
+      name: fullname,
+      batteryStatus: batteryStatus);
 
   factory UserLocationDto.fromJson(Map<String, dynamic> json) =>
       _$UserLocationDtoFromJson(json);

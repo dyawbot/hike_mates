@@ -7,6 +7,7 @@ class UserLocationEntity extends AppEntity {
   final String? hikeCode;
   final String? dateCreated;
   final String? name;
+  final String? batteryStatus;
 
   UserLocationEntity({
     this.lati,
@@ -15,9 +16,11 @@ class UserLocationEntity extends AppEntity {
     this.hikeCode,
     this.dateCreated,
     this.name,
+    this.batteryStatus,
   });
   // UserLocationEntity({this.lati, this.longi, this.userId, this.dateCreated});
 
   @override
-  List<Object?> get props => [lati, longi, userId, hikeCode, dateCreated, name];
+  List<Object?> get props =>
+      [lati, longi, userId, hikeCode, dateCreated, name, batteryStatus];
 }

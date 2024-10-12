@@ -84,7 +84,7 @@ class _$AppDatabase extends AppDatabase {
     Callback? callback,
   ]) async {
     final databaseOptions = sqflite.OpenDatabaseOptions(
-      version: 5,
+      version: 6,
       onConfigure: (database) async {
         await database.execute('PRAGMA foreign_keys = ON');
         await callback?.onConfigure?.call(database);
@@ -104,7 +104,7 @@ class _$AppDatabase extends AppDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `hike_code_tbl` (`primaryId` INTEGER NOT NULL, `code` TEXT NOT NULL, `dateTime` TEXT NOT NULL, `userId` INTEGER, PRIMARY KEY (`primaryId`))');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `user_contact_emergency_tbl` (`primaryId` INTEGER PRIMARY KEY AUTOINCREMENT, `userId` INTEGER NOT NULL, `contactName` TEXT NOT NULL, `phoneNumber` TEXT NOT NULL)');
+            'CREATE TABLE IF NOT EXISTS `user_contact_emergency_tbl` (`primaryId` INTEGER PRIMARY KEY AUTOINCREMENT, `userId` INTEGER NOT NULL, `contactName` TEXT NOT NULL, `phoneNumber` TEXT NOT NULL, `imageFileName` TEXT NOT NULL)');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -260,7 +260,8 @@ class _$UserEmergencyContactDao extends UserEmergencyContactDao {
                   'primaryId': item.primaryId,
                   'userId': item.userId,
                   'contactName': item.contactName,
-                  'phoneNumber': item.phoneNumber
+                  'phoneNumber': item.phoneNumber,
+                  'imageFileName': item.imageFileName
                 });
 
   final sqflite.DatabaseExecutor database;
@@ -278,6 +279,7 @@ class _$UserEmergencyContactDao extends UserEmergencyContactDao {
         mapper: (Map<String, Object?> row) => UserEmergencyContactEntity(
             row['contactName'] as String,
             row['phoneNumber'] as String,
+            row['imageFileName'] as String,
             row['userId'] as int,
             primaryId: row['primaryId'] as int?));
   }
@@ -295,7 +297,7 @@ class _$UserEmergencyContactDao extends UserEmergencyContactDao {
   ) async {
     return _queryAdapter.query(
         'UPDATE user_contact_emergency_tbl      SET contactName = ?2,          phoneNumber = ?3     WHERE primaryId = ?1',
-        mapper: (Map<String, Object?> row) => UserEmergencyContactEntity(row['contactName'] as String, row['phoneNumber'] as String, row['userId'] as int, primaryId: row['primaryId'] as int?),
+        mapper: (Map<String, Object?> row) => UserEmergencyContactEntity(row['contactName'] as String, row['phoneNumber'] as String, row['imageFileName'] as String, row['userId'] as int, primaryId: row['primaryId'] as int?),
         arguments: [primaryId, contactName, phoneNumber]);
   }
 

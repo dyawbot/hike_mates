@@ -13,7 +13,7 @@ class _GetAllLocationApi implements GetAllLocationApi {
     this._dio, {
     this.baseUrl,
   }) {
-    baseUrl ??= 'https://www.hikemates.online/hike_mates';
+    baseUrl ??= 'http://192.168.1.16/hike_mates';
   }
 
   final Dio _dio;

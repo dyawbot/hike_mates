@@ -28,8 +28,8 @@ class UserEmergencyContactRepoImpl extends UserEmergencyContactRepository {
       }
 
       // var userData = await loginDao.getLogin();
-      var paramsData = UserEmergencyContactEntity(
-          params.contactName, params.phoneNumber, userData.userId!);
+      var paramsData = UserEmergencyContactEntity(params.contactName,
+          params.phoneNumber, params.imageFileName, userData.userId!);
 
       await userEmergencyContactDao.insert(paramsData);
       logger.d("asdasdsfadfgadsg");

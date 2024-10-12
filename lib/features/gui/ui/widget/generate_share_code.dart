@@ -4,19 +4,18 @@ import 'package:flutter/material.dart';
 
 class GenerateShareCodeWidget extends StatelessWidget {
   final String hikeCode;
-  final bool isGenerated;
+
   final bool isEnterCode;
   final TextEditingController controller;
   final void Function() submitFunction;
-  final void Function() generateCardFunction;
+  // final void Function() generateCardFunction;
   final void Function() enterCodeFunction;
   final void Function() closeFunction;
   const GenerateShareCodeWidget(this.hikeCode,
       {required this.controller,
-      required this.isGenerated,
       this.isEnterCode = false,
       required this.submitFunction,
-      required this.generateCardFunction,
+      // required this.generateCardFunction,
       required this.enterCodeFunction,
       required this.closeFunction,
       super.key});
@@ -34,12 +33,12 @@ class GenerateShareCodeWidget extends StatelessWidget {
               duration: const Duration(milliseconds: 500),
               curve: Curves.easeInOut,
               width: 300,
-              height: 210,
+              height: 170,
             ),
 
             Positioned(
                 right: 0,
-                top: -8,
+                top: -6,
                 child: IconButton(
                     onPressed: closeFunction,
                     icon: const Icon(
@@ -54,7 +53,7 @@ class GenerateShareCodeWidget extends StatelessWidget {
               curve: isEnterCode ? Curves.easeIn : Curves.easeOut,
               right: 0,
               left: 0,
-              bottom: !isEnterCode ? 130 : -1000,
+              bottom: !isEnterCode ? 75 : -1000,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 child: Container(
@@ -76,15 +75,11 @@ class GenerateShareCodeWidget extends StatelessWidget {
 
             //!ENTERED CODE
             AnimatedPositioned(
-                duration: const Duration(milliseconds: 500),
+                duration: const Duration(milliseconds: 300),
                 curve: isEnterCode ? Curves.easeIn : Curves.easeOut,
                 right: 0,
                 left: 0,
-                bottom: isGenerated
-                    ? 1000
-                    : !isEnterCode
-                        ? 500
-                        : 110,
+                bottom: !isEnterCode ? 500 : 60,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: TextFormField(
@@ -113,11 +108,11 @@ class GenerateShareCodeWidget extends StatelessWidget {
                 )),
 
             AnimatedPositioned(
-                duration: const Duration(milliseconds: 500),
-                curve: isGenerated ? Curves.easeIn : Curves.easeOut,
+                duration: const Duration(milliseconds: 270),
+                curve: isEnterCode ? Curves.easeIn : Curves.easeOut,
                 right: 0,
                 left: 0,
-                bottom: !isGenerated ? 60 : -1000,
+                bottom: !isEnterCode ? 12 : -1000,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: ElevatedButton(
@@ -133,15 +128,11 @@ class GenerateShareCodeWidget extends StatelessWidget {
                 )),
 
             AnimatedPositioned(
-                duration: const Duration(milliseconds: 500),
-                curve: isGenerated ? Curves.easeIn : Curves.easeOut,
+                duration: const Duration(milliseconds: 270),
+                curve: isEnterCode ? Curves.easeIn : Curves.easeOut,
                 right: 0,
                 left: 0,
-                bottom: isEnterCode
-                    ? 10
-                    : !isGenerated
-                        ? -1000
-                        : 10,
+                bottom: !isEnterCode ? -1000 : 10,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: ElevatedButton(
@@ -154,32 +145,32 @@ class GenerateShareCodeWidget extends StatelessWidget {
                           style: TextStyle(color: Colors.white))),
                 )),
 
-            AnimatedPositioned(
-                duration: const Duration(milliseconds: 500),
-                curve: isGenerated ? Curves.easeIn : Curves.easeOut,
-                right: 0,
-                left: 0,
-                bottom: isEnterCode
-                    ? -1000
-                    : !isGenerated
-                        ? 10
-                        : 60,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12)),
-                          backgroundColor: const Color(0xFF0000FF)),
-                      onPressed: generateCardFunction,
-                      child: Text(
-                          hikeCode == "Hike Code"
-                              ? "Generate"
-                              : isGenerated
-                                  ? "Re-generate"
-                                  : "Generate",
-                          style: const TextStyle(color: Colors.white))),
-                )),
+            // AnimatedPositioned(
+            //     duration: const Duration(milliseconds: 500),
+            //     curve: isGenerated ? Curves.easeIn : Curves.easeOut,
+            //     right: 0,
+            //     left: 0,
+            //     bottom: isEnterCode
+            //         ? -1000
+            //         : !isGenerated
+            //             ? 10
+            //             : 60,
+            //     child: Padding(
+            //       padding: const EdgeInsets.symmetric(horizontal: 12),
+            //       child: ElevatedButton(
+            //           style: ElevatedButton.styleFrom(
+            //               shape: RoundedRectangleBorder(
+            //                   borderRadius: BorderRadius.circular(12)),
+            //               backgroundColor: const Color(0xFF0000FF)),
+            //           onPressed: generateCardFunction,
+            //           child: Text(
+            //               hikeCode == "Hike Code"
+            //                   ? "Generate"
+            //                   : isGenerated
+            //                       ? "Re-generate"
+            //                       : "Generate",
+            //               style: const TextStyle(color: Colors.white))),
+            //     )),
           ],
         ),
       ),

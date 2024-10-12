@@ -1,5 +1,7 @@
 // ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
 
+import 'dart:io';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -58,9 +60,9 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreenPage> {
       if (_contacts.length < 3) {
         // _contacts.add(newContact);
 
-        var params = UserContactEmergencyParams(
-            widget.userId, newContact["name"]!, newContact["phone"]!);
-
+        var params = UserContactEmergencyParams(widget.userId,
+            newContact["name"]!, newContact["phone"]!, newContact['photo']!);
+        logger.d(params);
         _bloc.add(AddContactInfoEvent(params: params));
         logger.d("asdasd");
       } else {
@@ -114,6 +116,8 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreenPage> {
 
   @override
   Widget build(BuildContext context) {
+    final double _width = MediaQuery.of(context).size.width;
+    final double _height = MediaQuery.of(context).size.height;
     return BlocConsumer<EmergencyContactPageBloc, EmergencyContactPageState>(
       bloc: _bloc,
       listener: (context, state) {
@@ -127,6 +131,7 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreenPage> {
               var dataEntity = {
                 'name': e.contactName,
                 'phone': e.phoneNumber,
+                'photo': e.imageFileName,
               };
               return dataEntity;
             }).toList();
@@ -142,6 +147,7 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreenPage> {
               var dataEntity = {
                 'name': e.contactName,
                 'phone': e.phoneNumber,
+                'photo': e.imageFileName,
               };
               return dataEntity;
             }).toList();
@@ -161,11 +167,12 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreenPage> {
           body: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                color: const Color.fromARGB(255, 255, 255, 255),
-                padding: const EdgeInsets.all(16),
-                child: GestureDetector(
-                  onTap: _addContact,
+              GestureDetector(
+                onTap: _addContact,
+                child: Container(
+                  width: _width,
+                  color: const Color.fromARGB(255, 255, 255, 255),
+                  padding: const EdgeInsets.all(16),
                   child: const Row(
                     children: [
                       CircleAvatar(
@@ -204,9 +211,12 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreenPage> {
 
                         _emergencyCall(number);
                       },
-                      leading: const Icon(
-                        Icons.people,
-                        size: 48,
+                      leading: CircleAvatar(
+                        backgroundImage: contact['photo'] != null
+                            ? FileImage(
+                                File(contact['photo']!)) // Load from file path
+                            : const AssetImage('assets/placeholder.png')
+                                as ImageProvider, // Fallback to asset image
                       ),
                       title: Text(contact['name']!),
                       subtitle: Text(contact['phone']!),

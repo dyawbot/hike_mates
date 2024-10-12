@@ -13,7 +13,7 @@ class _UserLocationApi implements UserLocationApi {
     this._dio, {
     this.baseUrl,
   }) {
-    baseUrl ??= 'https://www.hikemates.online/hike_mates';
+    baseUrl ??= 'http://192.168.1.16/hike_mates';
   }
 
   final Dio _dio;
@@ -27,6 +27,7 @@ class _UserLocationApi implements UserLocationApi {
     required String longi,
     required int userId,
     required String hikeCode,
+    required String batteryStatus,
     required dynamic userLocationUpdate,
   }) async {
     const _extra = <String, dynamic>{};
@@ -37,6 +38,7 @@ class _UserLocationApi implements UserLocationApi {
       'long': longi,
       'userId': userId,
       'hikeCode': hikeCode,
+      'batteryStatus': batteryStatus,
       'userDateLocUpdate': userLocationUpdate,
     };
     final _result = await _dio.fetch<Map<String, dynamic>>(

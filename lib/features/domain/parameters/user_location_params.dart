@@ -6,12 +6,14 @@ class UserLocationParams extends Params {
   final int? userId;
   final String? name;
   final String hikeCode;
+  final String? batteryStatus;
 
   UserLocationParams(
       {required this.lati,
       required this.longi,
       this.userId,
       this.name,
+      this.batteryStatus,
       required this.hikeCode});
 
   @override
@@ -21,6 +23,7 @@ class UserLocationParams extends Params {
         userId,
         hikeCode,
         name,
+        batteryStatus,
       ];
 }
 

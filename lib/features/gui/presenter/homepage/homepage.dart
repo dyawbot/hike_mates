@@ -6,8 +6,10 @@ import 'dart:math';
 
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:auto_route/auto_route.dart';
+import 'package:battery_plus/battery_plus.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:hike_mates/common/app_module.dart';
 import 'package:hike_mates/features/domain/entity/login_entity.dart';
 import 'package:hike_mates/features/domain/parameters/hike_code_params.dart';
@@ -17,6 +19,9 @@ import 'package:hike_mates/features/gui/constants/string_random.dart';
 import 'package:hike_mates/features/gui/controllers/map_string_controller.dart';
 import 'package:hike_mates/features/gui/controllers/throll_debouncer_services.dart';
 import 'package:hike_mates/features/gui/presenter/homepage/home_page_bloc.dart';
+import 'package:hike_mates/features/gui/presenter/homepage/widgets/build_symbol_dialog.dart';
+import 'package:hike_mates/features/gui/presenter/homepage/widgets/calculate_distance.dart';
+
 import 'package:hike_mates/features/gui/ui/widget/custo_alert_dialog.dart';
 import 'package:hike_mates/features/gui/ui/widget/generate_share_code.dart';
 
@@ -25,7 +30,7 @@ import 'package:logger/logger.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:flutter/material.dart';
 import 'package:hike_mates/features/gui/ui/drawer/drawer.dart';
-// import 'package:hike_mates/features/gui/ui/drawer/emergency_contacts.dart';
+
 import 'package:hike_mates/features/gui/ui/routers/app_router.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -43,7 +48,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomepageState extends State<HomePage>
-    with ThrollService, DebounceService {
+    with ThrollService, DebounceService, CalculateDistance {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final _homeBloc = getIt<HomePageBloc>();
   final logger = Logger();
@@ -57,9 +62,10 @@ class _HomepageState extends State<HomePage>
   bool isPressesLocation = false;
   bool isLocationActivated = false;
   bool isButtonEnabled = false;
-  bool isGenerated = false;
+
   bool isEnterCode = false;
   bool isLoading = false;
+  bool isSendingHelp = false;
   double lat = 0.0;
   double lng = 0.0;
 
@@ -75,14 +81,26 @@ class _HomepageState extends State<HomePage>
   Timer? _timer;
   Timer? _timerRefresh;
   final StringRandom _stringRandom = StringRandom();
+  Timer? pulseTimer;
+  double baseRadius = 500.0; // Base radius in meters
+  double maxPulseRadius = 1000.0; // Maximum radius for pulsing effect
+  double minPulseRadius = 100.0; // Minimum radius for pulsing effect
+  bool isIncreasing = true;
+  bool isCircleAdded = false;
+  final Battery _battery = Battery();
+  int _batteryPercentage = 50;
+  Location location = Location();
+  late LatLng _currentLocation;
 
   final TextEditingController hikeCode = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    _getBatteryPercentage();
     inputCode.addListener(_validateInput);
     String? hikeCode = widget.hikeCode;
+    getLocation();
 
     // logger.d(hikeCode);
     setState(() {
@@ -90,18 +108,29 @@ class _HomepageState extends State<HomePage>
         generateHikeCode = hikeCode;
       }
     });
-    _timerRefresh = Timer.periodic(const Duration(seconds: 5), (timer) {
+    _timerRefresh = Timer.periodic(const Duration(seconds: 2), (timer) {
       _refreshData();
     });
   }
 
   @override
   void dispose() {
+    pulseTimer?.cancel();
     inputCode.dispose();
     _timer?.cancel();
     _timerRefresh?.cancel();
+    _mapController?.dispose();
+    _mapController = null;
 
     super.dispose();
+  }
+
+  Future<void> _getBatteryPercentage() async {
+    int batteryLevel = await _battery.batteryLevel;
+
+    setState(() {
+      _batteryPercentage = batteryLevel;
+    });
   }
 
   void _locationUpdate(UserLocation userLocation) async {
@@ -116,28 +145,31 @@ class _HomepageState extends State<HomePage>
       Point point = await _mapController!.toScreenLocation(myLoc);
       var radius = await _mapController!.getMetersPerPixelAtLatitude(lat);
 
-      if (isPressesLocation && radius > 75) {
-        await _mapController!.animateCamera(
-            CameraUpdate.newLatLngZoom(LatLng(lat, longi), _zoomLevel));
-      }
+      if (!isSendingHelp) {
+        if (isPressesLocation && radius > 75) {
+          await _mapController!.animateCamera(
+              CameraUpdate.newLatLngZoom(LatLng(lat, longi), _zoomLevel));
+        }
 
-      UserLocationParams params = UserLocationParams(
-          lati: lat.toString(),
-          longi: longi.toString(),
-          hikeCode: generateHikeCode,
-          userId: widget.userId);
+        UserLocationParams params = UserLocationParams(
+            lati: lat.toString(),
+            longi: longi.toString(),
+            hikeCode: generateHikeCode,
+            batteryStatus: _batteryPercentage.toString(),
+            userId: widget.userId);
 
-      logger.d(params);
-      _homeBloc.add(SaveUserLocationEvent(params));
-
-      throttleFunction(() {
         logger.d(params);
         _homeBloc.add(SaveUserLocationEvent(params));
-      });
 
-      debounceFunction(() {
-        logger.d("THIS IS MY DEBOUNCER CHECK: $myLoc");
-      });
+        throttleFunction(() {
+          logger.d(params);
+          _homeBloc.add(SaveUserLocationEvent(params));
+        });
+
+        debounceFunction(() {
+          logger.d("THIS IS MY DEBOUNCER CHECK: $myLoc");
+        });
+      }
     }
     // Point points = await
   }
@@ -187,6 +219,8 @@ class _HomepageState extends State<HomePage>
       _mapController = controller;
       Future.delayed(const Duration(milliseconds: 1000)).then((value) {
         addMarkers();
+        startPulsingEffect();
+        _mapController?.onSymbolTapped.add(_onSymbolTapped);
       });
     });
   }
@@ -245,7 +279,7 @@ class _HomepageState extends State<HomePage>
     // logger.d(generateHikeCode.length);
     if (generateHikeCode.length != 4) {
       // generateHikeCode = "Hike Code";
-      isGenerated = false;
+
       isEnterCode = false;
 
       showDialog(
@@ -255,7 +289,6 @@ class _HomepageState extends State<HomePage>
                 return GenerateShareCodeWidget(
                   generateHikeCode,
                   controller: inputCode,
-                  isGenerated: isGenerated,
                   submitFunction: _submitCode,
                   isEnterCode: isEnterCode,
                   closeFunction: () {
@@ -264,7 +297,7 @@ class _HomepageState extends State<HomePage>
                       generateHikeCode = "Hike Code";
                     });
                   },
-                  generateCardFunction: () => _generateCodeFunction(setState),
+                  // generateCardFunction: () => _generateCodeFunction(setState),
                   enterCodeFunction: () => _enterCodeFunction(setState),
                 );
               }));
@@ -275,63 +308,62 @@ class _HomepageState extends State<HomePage>
     }
   }
 
-  void _generateCodeFunction(StateSetter setState) {
-    int elapsedTime = 0;
-    setState(() {
-      isLoading = true;
-    });
+  // void _generateCodeFunction(StateSetter setState) {
+  //   int elapsedTime = 0;
+  //   setState(() {
+  //     isLoading = true;
+  //   });
 
-    Timer.periodic(const Duration(milliseconds: 200), (timer) async {
-      elapsedTime += 200;
+  //   Timer.periodic(const Duration(milliseconds: 200), (timer) async {
+  //     elapsedTime += 200;
 
-      if (elapsedTime >= 3000) {
-        timer.cancel();
-        _timer = null;
-        setState(() {
-          isGenerated = true;
-          isEnterCode = false;
-          isLoading = false;
-          Navigator.pop(context);
-        });
-      } else {
-        setState(() {
-          // If less than 3 seconds have elapsed, continue with the normal functionality
-          String code = _stringRandom.getRandomString(4);
-          Future.delayed(const Duration(milliseconds: 1000));
-          generateHikeCode = code;
-          isGenerated = false;
-          isEnterCode = false;
-        });
-      }
-    });
+  //     if (elapsedTime >= 3000) {
+  //       timer.cancel();
+  //       _timer = null;
+  //       setState(() {
+  //         isEnterCode = false;
+  //         isLoading = false;
+  //         Navigator.pop(context);
+  //       });
+  //     } else {
+  //       setState(() {
+  //         // If less than 3 seconds have elapsed, continue with the normal functionality
+  //         String code = _stringRandom.getRandomString(4);
+  //         Future.delayed(const Duration(milliseconds: 1000));
+  //         generateHikeCode = code;
 
-    if (isLoading) {
-      showDialog(
-          context: context,
-          builder: (context) {
-            return const Dialog(
-              backgroundColor: Colors.transparent,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(
-                    color: Colors.orange,
-                  ),
-                  SizedBox(
-                    height: 30,
-                  ),
-                  Text(
-                    "Auto generating code, wait for a moment",
-                    style: TextStyle(color: Colors.white),
-                  )
-                ],
-              ),
-            );
-          });
-    } else {
-      Navigator.pop(context);
-    }
-  }
+  //         isEnterCode = false;
+  //       });
+  //     }
+  //   });
+
+  //   if (isLoading) {
+  //     showDialog(
+  //         context: context,
+  //         builder: (context) {
+  //           return const Dialog(
+  //             backgroundColor: Colors.transparent,
+  //             child: Column(
+  //               mainAxisAlignment: MainAxisAlignment.center,
+  //               children: [
+  //                 CircularProgressIndicator(
+  //                   color: Colors.orange,
+  //                 ),
+  //                 SizedBox(
+  //                   height: 30,
+  //                 ),
+  //                 Text(
+  //                   "Auto generating code, wait for a moment",
+  //                   style: TextStyle(color: Colors.white),
+  //                 )
+  //               ],
+  //             ),
+  //           );
+  //         });
+  //   } else {
+  //     Navigator.pop(context);
+  //   }
+  // }
 
   void _enterCodeFunction(StateSetter setState) {
     setState(() {
@@ -408,33 +440,141 @@ class _HomepageState extends State<HomePage>
     // logger.d(data);
     // var loc = data.map((e) => e["locations"]).toList();
 
-    if (_mapController!.symbols.isNotEmpty) {
-      await _mapController!.clearSymbols();
-    }
-    for (var entry in data) {
-      var name = entry["name"];
-      var location = entry["locations"];
+    if (_mapController != null) {
+      if (_mapController!.symbols.isNotEmpty) {
+        await _mapController!.clearSymbols();
+      }
+      for (var entry in data) {
+        var name = entry["name"];
+        var location = entry["locations"];
 
-      if (location is LatLng) {
-        if (!_mapController!.symbols
-            .any((symbol) => symbol.options.geometry == location)) {
-          await _mapController!.addSymbol(
-            SymbolOptions(
-                geometry: location,
-                iconImage: "assets/marker.png",
-                iconSize: 2,
-                textOpacity: 0.5,
-                textAnchor: "bottom",
-                textHaloColor: "#99FFFF",
-                textHaloWidth: 10.0, // The width of the halo (in pixels)
-                textHaloBlur: 2,
-                textColor: "#F00000",
-                textTransform: "uppercase",
-                textField: name),
-          );
+        if (location is LatLng) {
+          if (!_mapController!.symbols
+              .any((symbol) => symbol.options.geometry == location)) {
+            addRadiusCircle(location, 500);
+
+            await _mapController!.addSymbol(
+              SymbolOptions(
+                  geometry: location,
+                  iconOpacity: 0.9,
+                  iconImage: "assets/marker.png",
+                  iconSize: 0.8,
+                  textOpacity: 0.8,
+                  textAnchor: "bottom",
+                  textHaloColor: "#99FFFF",
+                  textHaloWidth: 10.0, // The width of the halo (in pixels)
+                  textHaloBlur: 2,
+                  textColor: "#F00000",
+                  textTransform: "uppercase",
+                  textField: name),
+            );
+          }
         }
+
+        // addCircleToMap(_mapController!, location, 100);s
       }
     }
+  }
+
+  void addRadiusCircle(LatLng location, double radiusInMeters) async {
+    await _mapController!.addCircle(
+      CircleOptions(
+        geometry: location,
+        circleRadius: _calculateCircleRadius(radiusInMeters),
+        circleColor: '#FF9933', // Orange color for the circle
+        circleOpacity: 0.2,
+      ),
+    );
+    setState(() {
+      isCircleAdded = true;
+    });
+  }
+
+  // Adjust circle size based on zoom level
+  double _calculateCircleRadius(double radiusInMeters) {
+    double zoomLevel = _mapController!.cameraPosition!.zoom;
+    double radius =
+        radiusInMeters / (1000 / (zoomLevel + 2)); // Adjust this formula
+    return radius;
+  }
+
+  void startPulsingEffect() {
+    pulseTimer =
+        Timer.periodic(const Duration(milliseconds: 200), (Timer timer) {
+      setState(() {
+        if (isIncreasing) {
+          baseRadius += 10;
+          if (baseRadius >= maxPulseRadius) {
+            isIncreasing = false;
+          }
+        } else {
+          baseRadius -= 10;
+          if (baseRadius <= minPulseRadius) {
+            isIncreasing = true;
+          }
+        }
+      });
+
+      // Update the circle's radius dynamically (replace with actual logic to update the circle)
+      for (var entry in data) {
+        var location = entry["locations"];
+        if (_mapController != null && isCircleAdded) {
+          if (location is LatLng) {
+            _mapController!.updateCircle(
+              _mapController!.circles.firstWhere(
+                (circle) => circle.options.geometry == location,
+              ),
+              CircleOptions(
+                circleRadius: _calculateCircleRadius(baseRadius),
+              ),
+            );
+          }
+        }
+      }
+    });
+  }
+
+  void _onSymbolTapped(Symbol symbol) {
+    showModalBottomSheet(
+      backgroundColor: const Color(0xFFFFF3E7),
+      context: context,
+      builder: (context) => StatefulBuilder(builder: (context, setState) {
+        double distance = calculateDistance(
+            _currentLocation.latitude,
+            _currentLocation.longitude,
+            symbol.options.geometry!.latitude,
+            symbol.options.geometry!.longitude);
+        var batteryStatus = data.firstWhere(
+          (d) =>
+              d['name'].toString().toLowerCase() ==
+              symbol.options.textField.toString().toLowerCase(),
+          orElse: () => {}, // Default value if no match is found
+        )['batteryStatus'];
+        return BuildSymbolDialogWidget(
+          distance: distance,
+          symbol: symbol,
+          batteryStatus: batteryStatus,
+          onPressedHelp: _onPressedHelp,
+        );
+      }),
+    );
+  }
+
+  void _onPressedHelp() {
+    setState(() {
+      isSendingHelp = !isSendingHelp;
+    });
+
+    _onMapLocation();
+  }
+
+  Future<void> getLocation() async {
+    // var data = await Geolocator.getCurrentPosition();
+
+    var locations = await location.getLocation();
+    setState(() {
+      _currentLocation = LatLng(locations.latitude!, locations.longitude!);
+    });
   }
 
   @override
@@ -460,6 +600,7 @@ class _HomepageState extends State<HomePage>
               var latLng = {
                 "userId": e.userId,
                 "name": e.name,
+                "batteryStatus": e.batteryStatus,
                 "locations": latLngData
               };
 
@@ -481,6 +622,9 @@ class _HomepageState extends State<HomePage>
         }
 
         if (state is HomeLogoutState) {
+          setState(() {
+            _mapController = null;
+          });
           AutoRouter.of(context).replace(const LoginRoute());
         }
       },

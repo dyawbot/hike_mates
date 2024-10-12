@@ -26,6 +26,7 @@ class EmergencyContactPageBloc
     this._deleteUserEmergencyContactUsecase,
   ) : super(EmergencyContactPageInitial()) {
     on<AddContactInfoEvent>((event, emit) async {
+      emit(EmergencyContactPageInitial());
       final logger = Logger();
 
       logger.d(event.params);
@@ -51,6 +52,8 @@ class EmergencyContactPageBloc
     });
 
     on<UpdateContactInfoEvent>((event, emit) async {
+      emit(EmergencyContactPageInitial());
+
       var result = await _updateUserEmergencyContactUsecase(event.params);
 
       var status = result.status;
@@ -68,6 +71,8 @@ class EmergencyContactPageBloc
     });
 
     on<DeleteContactInfoEvent>((event, emit) async {
+      emit(EmergencyContactPageInitial());
+
       var result = await _deleteUserEmergencyContactUsecase(event.params);
 
       var status = result.status;

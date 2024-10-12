@@ -7,6 +7,7 @@ import 'package:hike_mates/features/data/dao/user_hike_code_dao.dart';
 import 'package:hike_mates/features/domain/entity/login_entity.dart';
 import 'package:hike_mates/features/domain/entity/user_emergency_contact_entity.dart';
 import 'package:hike_mates/features/domain/entity/user_hike_code_entity.dart';
+import 'package:hike_mates/features/gui/presenter/emergency_contact_page/emergency_contact_page_bloc.dart';
 
 // ignore: depend_on_referenced_packages
 import 'package:sqflite/sqflite.dart' as sqflite;
@@ -14,7 +15,7 @@ import 'package:sqflite/sqflite.dart' as sqflite;
 part 'app_database.g.dart';
 
 @Database(
-  version: 5,
+  version: 6,
   entities: [LoginEntity, UserHikeCodeEntity, UserEmergencyContactEntity],
 )
 abstract class AppDatabase extends FloorDatabase {
@@ -64,9 +65,18 @@ abstract class AppDatabase extends FloorDatabase {
   ''');
   });
 
+  static final migrationVersion5to6 = Migration(5, 6, (database) async {
+    await database.execute('''
+        ALTER TABLE ${UserEmergencyContactEntity.tableName}  ADD COLUMN imageFileName TEXT;
+      ''');
+  });
+
   static Future<AppDatabase> create() async =>
       $FloorAppDatabase.databaseBuilder('app_database.db').addMigrations([
-        migrationVersion1to2
-      ]).addMigrations([migrationVersion2to3]).addMigrations(
-          [migrationVersion3to4]).addMigrations([migrationVersion4to5]).build();
+        migrationVersion1to2,
+        migrationVersion2to3,
+        migrationVersion3to4,
+        migrationVersion4to5,
+        migrationVersion5to6
+      ]).build();
 }

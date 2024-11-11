@@ -1,4 +1,4 @@
-package com.example.hike_mates
+package com.carpediemadv.hike_mates
 import android.os.Bundle
 import android.util.Log
 
@@ -7,7 +7,7 @@ import io.flutter.embedding.android.FlutterActivity
 
 class MainActivity: FlutterActivity() {
 
-    private val CHANNEL = "com.example.hike_mates/config";
+    private val CHANNEL = "com.carpediemadv.hike_mates/config";
 
     override fun onCreate(saveInstanceState : Bundle?){
         super.onCreate(saveInstanceState)
